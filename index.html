@@ -1,0 +1,2475 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyber Lab — Securitatea rețelelor și ethical hacking · clasa a XI-a</title>
+<meta name="description" content="Resursă educațională deschisă pentru clasa a XI-a — securitatea rețelelor, ethical hacking, CTF introductiv. Volumul 3 din seria Cyber Education.">
+<meta name="author" content="prof. Elena Drăgan">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root {
+  --bg: #0b1020;
+  --bg-2: #11172e;
+  --bg-3: #161d39;
+  --surface: #1a2244;
+  --line: #2a3460;
+  --ink: #e9ecf5;
+  --ink-dim: #aab3d1;
+  --ink-mute: #7e88ad;
+  --accent: #5eead4;
+  --accent-2: #38bdf8;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --ok: #4ade80;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --radius: 14px;
+  --max: 1080px;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --body: 'Manrope', system-ui, -apple-system, sans-serif;
+  --head: 'Sora', system-ui, -apple-system, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: #f6f7fb;
+  --bg-2: #ffffff;
+  --bg-3: #eef1f9;
+  --surface: #ffffff;
+  --line: #d8def0;
+  --ink: #0e1430;
+  --ink-dim: #3a4470;
+  --ink-mute: #6b7493;
+  --accent: #0f766e;
+  --accent-2: #0369a1;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --ok: #15803d;
+  --shadow: 0 8px 24px rgba(20,30,80,.08);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 { font-family: var(--head); font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); margin: 0 0 0.4em; }
+h2 { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin: 2em 0 0.6em; }
+h3 { font-size: 1.2rem; margin: 1.6em 0 0.5em; color: var(--accent); }
+h4 { font-size: 1rem; margin: 1.2em 0 0.4em; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+
+p { margin: 0.6em 0; }
+a { color: var(--accent-2); text-decoration: none; border-bottom: 1px solid transparent; transition: border .15s; }
+a:hover { border-bottom-color: var(--accent-2); }
+
+code, pre, .mono { font-family: var(--mono); }
+code { background: var(--bg-3); padding: 0.12em 0.4em; border-radius: 5px; font-size: 0.92em; }
+pre {
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+pre code { background: none; padding: 0; }
+
+/* layout */
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* header */
+header {
+  background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+}
+.head-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo {
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.logo small {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--ink-mute);
+  margin-left: 4px;
+}
+.head-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.icon-btn {
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* sidebar nav */
+.layout {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 24px 22px 60px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+}
+nav.sidebar {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.nav-group { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); margin: 18px 0 6px; font-weight: 600; }
+.nav-group:first-child { margin-top: 0; }
+nav.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 2px 0;
+  border-radius: 9px;
+  color: var(--ink-dim);
+  font-size: 0.92rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .15s;
+}
+nav.sidebar a:hover { background: var(--bg-2); color: var(--ink); }
+nav.sidebar a.active {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+  font-weight: 600;
+}
+nav.sidebar a .pill {
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  background: var(--bg-3);
+  padding: 1px 6px;
+  border-radius: 5px;
+  color: var(--ink-mute);
+}
+nav.sidebar a.active .pill { background: var(--accent); color: var(--bg); }
+nav.sidebar a.done::after {
+  content: '✓';
+  margin-left: auto;
+  color: var(--ok);
+  font-weight: 700;
+}
+
+/* main */
+main { min-width: 0; }
+.section { display: none; animation: fade .25s ease-out; }
+.section.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.kicker { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 6px; }
+
+/* cards & callouts */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin: 18px 0;
+  box-shadow: var(--shadow);
+}
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--bg-2);
+  padding: 14px 18px;
+  border-radius: 0 10px 10px 0;
+  margin: 18px 0;
+}
+.callout.warn { border-color: var(--warn); }
+.callout.danger { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--bg-2)); }
+.callout.ok { border-color: var(--ok); }
+.callout strong { display: block; margin-bottom: 4px; font-family: var(--head); }
+
+/* tables */
+.tbl { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.94rem; }
+.tbl th, .tbl td { padding: 10px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+.tbl th { background: var(--bg-3); font-family: var(--head); font-weight: 600; }
+.tbl tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-3) 50%, transparent); }
+
+/* grid 3 cols */
+.cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0; }
+.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+.col-card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: 12px;
+}
+.col-card h4 { margin-top: 0; color: var(--accent); }
+
+/* badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-family: var(--mono);
+  color: var(--ink-dim);
+}
+.badge.accent { background: color-mix(in srgb, var(--accent) 18%, var(--bg-3)); color: var(--accent); border-color: var(--accent); }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+
+/* buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.nav-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 38px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+/* timeline */
+.timeline { position: relative; padding-left: 28px; margin: 18px 0; }
+.timeline::before {
+  content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--line);
+}
+.tl-item { position: relative; padding: 4px 0 18px; }
+.tl-item::before {
+  content: ''; position: absolute; left: -24px; top: 8px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--bg);
+}
+.tl-item h4 { margin: 0 0 4px; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 1.05rem; }
+.tl-item small { color: var(--ink-mute); font-family: var(--mono); }
+
+/* landing */
+.hero {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, var(--surface)) 0%, var(--surface) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 38px 32px;
+  margin-bottom: 24px;
+}
+.hero h1 { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p.lead { font-size: 1.1rem; color: var(--ink-dim); max-width: 70ch; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.lesson-card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.lesson-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.lesson-card .num { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+.lesson-card h4 { margin: 4px 0 8px; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 1rem; }
+.lesson-card p { margin: 0; font-size: 0.85rem; color: var(--ink-mute); }
+.lesson-card.done { border-color: var(--ok); }
+.lesson-card.done .num::after { content: ' ✓'; }
+
+/* progress */
+.progress-wrap { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+.progress-bar { flex: 1; height: 8px; background: var(--bg-3); border-radius: 4px; overflow: hidden; }
+.progress-bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s; }
+.progress-text { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-dim); white-space: nowrap; }
+
+/* quiz */
+.quiz-q {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 14px 0;
+}
+.quiz-q h4 { margin: 0 0 12px; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 1rem; }
+.quiz-opt {
+  display: block;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  cursor: pointer;
+  font-size: 0.94rem;
+  transition: all .15s;
+}
+.quiz-opt:hover { border-color: var(--accent); }
+.quiz-opt.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--bg-2)); }
+.quiz-opt.correct { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--bg-2)); }
+.quiz-opt.wrong { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, var(--bg-2)); }
+.quiz-feedback { margin-top: 10px; font-size: 0.9rem; color: var(--ink-dim); display: none; }
+.quiz-feedback.show { display: block; }
+
+/* ctf */
+.ctf-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent-2);
+  border-radius: 0 12px 12px 0;
+  padding: 18px;
+  margin: 14px 0;
+}
+.ctf-card h4 { margin-top: 0; color: var(--accent-2); text-transform: none; letter-spacing: 0; font-size: 1.05rem; }
+.ctf-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.ctf-input input {
+  flex: 1;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+}
+.ctf-input input:focus { outline: none; border-color: var(--accent-2); }
+.ctf-feedback { margin-top: 8px; font-size: 0.9rem; font-family: var(--mono); display: none; }
+.ctf-feedback.ok { display: block; color: var(--ok); }
+.ctf-feedback.no { display: block; color: var(--danger); }
+
+/* certificate preview */
+.cert-preview {
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  border: 6px double #1e3a8a;
+  border-radius: 8px;
+  padding: 36px;
+  margin: 18px 0;
+  color: #0f172a;
+  font-family: var(--head);
+  text-align: center;
+  position: relative;
+}
+.cert-preview h2 { color: #1e3a8a; margin: 0 0 8px; font-size: 1.8rem; }
+.cert-preview .cert-sub { color: #475569; font-size: 0.95rem; margin-bottom: 24px; }
+.cert-preview .cert-name { font-size: 2rem; color: #0f172a; margin: 16px 0; border-bottom: 2px solid #1e3a8a; display: inline-block; padding: 0 30px 6px; }
+.cert-preview .cert-body { color: #1e293b; font-family: var(--body); line-height: 1.6; max-width: 60ch; margin: 16px auto; }
+.cert-preview .cert-badges { display: flex; gap: 8px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+.cert-preview .cert-badge {
+  background: #1e3a8a; color: #fff; padding: 4px 12px;
+  border-radius: 20px; font-size: 0.78rem; font-family: var(--mono);
+}
+.cert-preview .cert-badge.gold { background: #b45309; }
+.cert-preview .cert-mention {
+  font-size: 1.3rem; color: #b45309; margin-top: 14px;
+  font-weight: 700;
+}
+.cert-preview .cert-foot { color: #64748b; font-size: 0.8rem; margin-top: 24px; font-family: var(--mono); }
+
+/* form */
+input[type="text"].name-in {
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-family: var(--body);
+  font-size: 1rem;
+  width: 100%;
+  max-width: 360px;
+}
+input[type="text"].name-in:focus { outline: none; border-color: var(--accent); }
+
+/* footer */
+footer {
+  background: var(--bg-2);
+  border-top: 1px solid var(--line);
+  padding: 22px;
+  text-align: center;
+  color: var(--ink-mute);
+  font-size: 0.85rem;
+}
+
+/* responsive */
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; padding: 16px; }
+  nav.sidebar {
+    position: static;
+    max-height: none;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .cols-3, .cols-2 { grid-template-columns: 1fr; }
+}
+
+/* diagram blocks (inline svg) */
+svg.diag { max-width: 100%; height: auto; display: block; margin: 14px auto; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+svg.diag text { font-family: var(--body); fill: var(--ink); }
+svg.diag rect.box { fill: var(--bg-3); stroke: var(--accent); stroke-width: 1.5; }
+svg.diag line, svg.diag path.arr { stroke: var(--accent-2); stroke-width: 2; fill: none; }
+
+/* objectives + retain blocks */
+.objectives {
+  background: color-mix(in srgb, var(--accent-2) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent-2) 40%, var(--line));
+  border-left: 4px solid var(--accent-2);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 20px;
+  margin: 18px 0 24px;
+}
+.objectives h4 { margin-top: 0; color: var(--accent-2); text-transform: none; letter-spacing: 0; font-size: 1rem; font-family: var(--head); }
+.objectives ul { margin: 6px 0 0; padding-left: 22px; }
+.objectives ul li { margin: 4px 0; }
+
+.retain {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 20px;
+  margin: 28px 0 18px;
+}
+.retain h4 { margin-top: 0; color: var(--accent); text-transform: none; letter-spacing: 0; font-size: 1rem; font-family: var(--head); }
+.retain ul { margin: 6px 0 0; padding-left: 22px; }
+.retain ul li { margin: 4px 0; }
+
+/* bibliography */
+.biblio-list { list-style: none; padding: 0; margin: 14px 0; }
+.biblio-list li {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  font-size: 0.92rem;
+}
+.biblio-list li strong { color: var(--accent); }
+.biblio-list li .biblio-meta { color: var(--ink-mute); font-family: var(--mono); font-size: 0.82rem; display: block; margin-top: 2px; }
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="shell">
+
+<!-- ============== HEADER ============== -->
+<header>
+  <div class="head-inner">
+    <div class="logo">
+      <span class="dot"></span>Cyber Lab
+      <small>· clasa a XI-a</small>
+    </div>
+    <div class="head-actions">
+      <button class="icon-btn" id="themeBtn" title="Comută tema" aria-label="Comută tema">🌓</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============== SIDEBAR ============== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="nav-group">Început</div>
+    <a data-section="home"><span class="pill">↩</span> Acasă</a>
+
+    <div class="nav-group">Lecții</div>
+    <a data-section="l1"><span class="pill">L1</span> Protocoale de rețea</a>
+    <a data-section="l2"><span class="pill">L2</span> TCP/IP aprofundat</a>
+    <a data-section="l3"><span class="pill">L3</span> DNS</a>
+    <a data-section="l4"><span class="pill">L4</span> Atacuri DDoS</a>
+    <a data-section="l5"><span class="pill">L5</span> Recapitulare</a>
+    <a data-section="l6"><span class="pill">L6</span> Firewall</a>
+    <a data-section="l7"><span class="pill">L7</span> Wireshark (demo)</a>
+    <a data-section="l8"><span class="pill">L8</span> Linux security</a>
+    <a data-section="l9"><span class="pill">L9</span> CTF introductiv</a>
+    <a data-section="l10"><span class="pill">L10</span> Cariere + Evaluare</a>
+
+    <div class="nav-group">Resurse</div>
+    <a data-section="about"><span class="pill">i</span> Despre</a>
+  </nav>
+
+  <!-- ============== MAIN ============== -->
+  <main id="main">
+
+<!-- ================ HOME ================ -->
+<section id="sec-home" class="section active">
+  <div class="hero">
+    <div class="kicker">VOLUMUL 3 · SERIA CYBER EDUCATION</div>
+    <h1>Cyber Lab</h1>
+    <p class="lead">Introducere în <strong>securitatea rețelelor</strong> și <strong>ethical hacking</strong> pentru elevii clasei a XI-a. Învață cum circulă datele, cum se apără și cum se atacă o rețea — etic, legal, în laborator.</p>
+    <div class="badges">
+      <span class="badge accent">Nivel: Intermediar-Avansat</span>
+      <span class="badge">Clasa a XI-a</span>
+      <span class="badge">10 lecții</span>
+      <span class="badge">CTF inclus</span>
+      <span class="badge">Certificat PDF</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn" onclick="go('l1')">▶ Începe cursul</button>
+      <button class="btn ghost" onclick="go('about')">Despre resursă</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Progresul tău</h3>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div id="progressBar" style="width:0%"></div></div>
+      <span class="progress-text" id="progressText">0 / 10 lecții parcurse</span>
+    </div>
+    <p style="color:var(--ink-mute); font-size:.9rem; margin:0;">Progresul se salvează local în browserul tău. Nu se trimite nimic spre niciun server.</p>
+  </div>
+
+  <h2>Structura cursului</h2>
+  <div class="lesson-grid">
+    <div class="lesson-card" data-go="l1" onclick="go('l1')"><div class="num">L1</div><h4>Protocoale de rețea</h4><p>Modelele OSI și TCP/IP, încapsularea, porturile.</p></div>
+    <div class="lesson-card" data-go="l2" onclick="go('l2')"><div class="num">L2</div><h4>TCP/IP aprofundat</h4><p>Three-way handshake, adresare IP, NAT.</p></div>
+    <div class="lesson-card" data-go="l3" onclick="go('l3')"><div class="num">L3</div><h4>DNS</h4><p>Rezoluția numelor, ierarhia, atacuri de spoofing.</p></div>
+    <div class="lesson-card" data-go="l4" onclick="go('l4')"><div class="num">L4</div><h4>Atacuri DDoS</h4><p>Volumetric, protocol, application-layer. Apărare.</p></div>
+    <div class="lesson-card" data-go="l5" onclick="go('l5')"><div class="num">L5</div><h4>Recapitulare</h4><p>Sinteză L1–L4 cu quiz scurt.</p></div>
+    <div class="lesson-card" data-go="l6" onclick="go('l6')"><div class="num">L6</div><h4>Firewall</h4><p>Filtrare, stateful inspection, reguli iptables.</p></div>
+    <div class="lesson-card" data-go="l7" onclick="go('l7')"><div class="num">L7</div><h4>Wireshark</h4><p>Demo de analiză a traficului capturat.</p></div>
+    <div class="lesson-card" data-go="l8" onclick="go('l8')"><div class="num">L8</div><h4>Linux security</h4><p>Permisiuni, sudo, hardening de bază.</p></div>
+    <div class="lesson-card" data-go="l9" onclick="go('l9')"><div class="num">L9</div><h4>CTF introductiv</h4><p>4 mini-challenge-uri rezolvabile aici.</p></div>
+    <div class="lesson-card" data-go="l10" onclick="go('l10')"><div class="num">L10</div><h4>Cariere + Evaluare</h4><p>10 întrebări + certificat PDF.</p></div>
+  </div>
+
+  <div class="callout warn">
+    <strong>⚠️ Înainte de a începe — angajament etic</strong>
+    Toate tehnicile prezentate în această resursă sunt destinate <strong>exclusiv învățării în laborator</strong> (mașini virtuale proprii, platforme CTF dedicate, rețele de test). Scanarea, interceptarea sau exploatarea fără autorizare scrisă a unor sisteme aparținând altor persoane este <strong>infracțiune</strong> în România conform Legii 161/2003, art. 360–366 din Codul penal. Ethical hacking-ul presupune întâi <em>etică</em>, apoi <em>hacking</em>.
+  </div>
+</section>
+
+<!-- ================ L1: PROTOCOALE ================ -->
+<section id="sec-l1" class="section">
+  <div class="kicker">LECȚIA 1 · CS 1.1</div>
+  <h1>Protocoale de rețea</h1>
+  <p class="lead">Un protocol este un set de reguli care descrie <strong>cum</strong> două dispozitive vorbesc între ele într-o rețea. Internetul nu este o singură tehnologie — este un teanc de protocoale care lucrează împreună.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să enumeri cele 7 niveluri ale modelului OSI și rolul lor;</li>
+      <li>să faci corespondența între modelul OSI și modelul TCP/IP cu 4 niveluri;</li>
+      <li>să descrii procesul de încapsulare și de-încapsulare a datelor;</li>
+      <li>să identifici porturile standard ale principalelor servicii (SSH, DNS, HTTP, HTTPS, SMTP).</li>
+    </ul>
+  </div>
+
+  <h2>1. De ce avem nevoie de protocoale</h2>
+  <p>Imaginează-ți două persoane care vor să-și transmită o scrisoare prin poștă, dar una scrie în română și alta în japoneză, una folosește plic A4 și alta plic A6, iar curierul nu știe nici limba, nici formatul. Scrisoarea nu ajunge. Protocoalele rezolvă exact această problemă pentru calculatoare: stabilesc <em>limba comună</em> (sintaxa), <em>formatul</em> și <em>regulile de livrare</em>.</p>
+
+  <h2>2. Modelul OSI — 7 straturi conceptuale</h2>
+  <p>Modelul OSI (Open Systems Interconnection) este o schemă teoretică standardizată de ISO în 1984 care împarte comunicarea în 7 niveluri funcționale. Fiecare nivel oferă servicii nivelului de deasupra și folosește servicii de la nivelul de dedesubt.</p>
+
+  <table class="tbl">
+    <thead><tr><th>#</th><th>Nivel OSI</th><th>Rol</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td>7</td><td>Aplicație</td><td>Interfața cu utilizatorul / aplicația</td><td>HTTP, FTP, SMTP, DNS</td></tr>
+      <tr><td>6</td><td>Prezentare</td><td>Formatare, criptare, compresie</td><td>TLS, JPEG, ASCII</td></tr>
+      <tr><td>5</td><td>Sesiune</td><td>Stabilește, menține, închide sesiuni</td><td>NetBIOS, RPC</td></tr>
+      <tr><td>4</td><td>Transport</td><td>Livrare end-to-end, control flux</td><td>TCP, UDP</td></tr>
+      <tr><td>3</td><td>Rețea</td><td>Adresare logică, rutare</td><td>IP, ICMP</td></tr>
+      <tr><td>2</td><td>Legătură de date</td><td>Adresare fizică (MAC), cadre</td><td>Ethernet, Wi-Fi</td></tr>
+      <tr><td>1</td><td>Fizic</td><td>Biți pe mediul fizic</td><td>cabluri, semnale radio</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>💡 Mnemonic util</strong>
+    De jos în sus: <code>Please Do Not Throw Sausage Pizza Away</code> (Physical, Data link, Network, Transport, Session, Presentation, Application).
+  </div>
+
+  <h2>3. Modelul TCP/IP — 4 straturi practice</h2>
+  <p>În practică, Internetul real folosește un model mai simplu, cu 4 straturi, definit de IETF. Acesta a fost proiectat după ce protocoalele existau deja (DARPA, anii '70), spre deosebire de OSI care a fost proiectat <em>înainte</em> de implementare.</p>
+
+  <table class="tbl">
+    <thead><tr><th>TCP/IP</th><th>Corespunde OSI</th><th>Protocoale tipice</th></tr></thead>
+    <tbody>
+      <tr><td>Aplicație</td><td>5+6+7</td><td>HTTP, HTTPS, DNS, SSH, SMTP</td></tr>
+      <tr><td>Transport</td><td>4</td><td>TCP, UDP</td></tr>
+      <tr><td>Internet</td><td>3</td><td>IPv4, IPv6, ICMP</td></tr>
+      <tr><td>Acces la rețea</td><td>1+2</td><td>Ethernet, Wi-Fi (802.11), PPP</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Încapsularea — cum „călătorește" un mesaj</h2>
+  <p>Când trimiți un mesaj prin WhatsApp, datele tale nu zboară prin cablu așa cum le-ai scris tu. Pe drumul lor în jos prin stivă, fiecare nivel adaugă <strong>propriul antet</strong> (header) — un fenomen numit <em>încapsulare</em>.</p>
+
+  <pre><code>[Date utilizator: "Bună!"]
+   ↓ Aplicație: + antet HTTP
+[HTTP | "Bună!"]
+   ↓ Transport: + antet TCP (porturi, secvențe)
+[TCP | HTTP | "Bună!"]
+   ↓ Internet: + antet IP (adrese IP sursă/destinație)
+[IP | TCP | HTTP | "Bună!"]
+   ↓ Acces: + antet Ethernet (adrese MAC) + trailer
+[ETH | IP | TCP | HTTP | "Bună!" | FCS]
+   → biți pe cablu</code></pre>
+
+  <p>La destinație, procesul se desface invers: <em>de-încapsulare</em>. Fiecare nivel își „mănâncă" antetul corespunzător și pasează restul în sus.</p>
+
+  <h2>5. Porturi — multiplexarea aplicațiilor</h2>
+  <p>Un calculator are <em>o singură</em> adresă IP, dar rulează simultan multe aplicații (browser, mail, joc, Spotify). Cum știe placa de rețea că un pachet TCP venit pe IP-ul tău este pentru browser, nu pentru Spotify? Răspuns: <strong>portul</strong>, un număr între 0 și 65535 atașat fiecărei conexiuni.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Port</th><th>Serviciu</th><th>Protocol</th></tr></thead>
+    <tbody>
+      <tr><td>22</td><td>SSH (acces remote securizat)</td><td>TCP</td></tr>
+      <tr><td>53</td><td>DNS</td><td>UDP / TCP</td></tr>
+      <tr><td>80</td><td>HTTP</td><td>TCP</td></tr>
+      <tr><td>443</td><td>HTTPS (HTTP peste TLS)</td><td>TCP</td></tr>
+      <tr><td>25</td><td>SMTP (trimitere email)</td><td>TCP</td></tr>
+      <tr><td>3306</td><td>MySQL</td><td>TCP</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Activitatea 1 · Identifică nivelul</h3>
+  <p>Pentru fiecare situație, scrie pe caiet la ce <strong>nivel OSI</strong> apare problema:</p>
+  <ol>
+    <li>Cablul Ethernet este rupt fizic.</li>
+    <li>Două dispozitive din aceeași rețea locală nu se „văd" la nivel MAC.</li>
+    <li>Browserul afișează <code>ERR_CERT_AUTHORITY_INVALID</code>.</li>
+    <li>O conexiune TCP cade după 30 de secunde fără date.</li>
+  </ol>
+
+  <div class="callout ok">
+    <strong>✅ Verifică-te</strong>
+    1 → Fizic · 2 → Legătură de date · 3 → Prezentare (TLS) · 4 → Transport (TCP).
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>OSI = 7 niveluri</strong> (de jos în sus): Fizic, Legătură de date, Rețea, Transport, Sesiune, Prezentare, Aplicație.</li>
+      <li><strong>TCP/IP = 4 niveluri</strong> practice: Acces la rețea, Internet, Transport, Aplicație.</li>
+      <li><strong>Încapsularea</strong> = fiecare nivel adaugă propriul antet la datele primite de la nivelul superior.</li>
+      <li><strong>Porturi de știut pe de rost:</strong> 22 SSH · 53 DNS · 80 HTTP · 443 HTTPS · 25 SMTP.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('home')">← Acasă</button>
+    <button class="btn" onclick="go('l2')">Următoarea: TCP/IP aprofundat →</button>
+  </div>
+</section>
+
+<!-- ================ L2: TCP/IP ================ -->
+<section id="sec-l2" class="section">
+  <div class="kicker">LECȚIA 2 · CS 1.2</div>
+  <h1>TCP/IP aprofundat</h1>
+  <p class="lead">Acum că știi <em>unde</em> se află TCP și IP în stivă, să vedem <em>ce</em> fac concret. TCP garantează livrarea; IP rutează pachetele între rețele. Împreună, formează coloana vertebrală a Internetului.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să distingi între IPv4 și IPv6 și să citești o adresă în notație CIDR;</li>
+      <li>să identifici adresele private (RFC 1918) și să explici rolul NAT;</li>
+      <li>să descrii cei trei pași ai handshake-ului TCP (SYN / SYN-ACK / ACK);</li>
+      <li>să alegi între TCP și UDP pentru o aplicație dată, motivând alegerea.</li>
+    </ul>
+  </div>
+
+  <h2>1. IP — adresarea logică</h2>
+  <p>Fiecare dispozitiv conectat la o rețea TCP/IP are o <strong>adresă IP</strong>. Există două versiuni utilizate astăzi:</p>
+  <ul>
+    <li><strong>IPv4</strong> — 32 de biți, scrisă ca 4 numere între 0–255 separate prin punct: <code>192.168.1.10</code>. Spațiu total: ≈4,3 miliarde de adrese. Epuizat oficial în 2011.</li>
+    <li><strong>IPv6</strong> — 128 de biți, scrisă ca 8 grupuri hexazecimale: <code>2001:db8::8a2e:370:7334</code>. Spațiu total: aproximativ 3,4 × 10³⁸ adrese — un spațiu de ordine de mărime considerat suficient pentru orice expansiune previzibilă a Internetului, inclusiv IoT.</li>
+  </ul>
+
+  <h3>Clase și mască</h3>
+  <p>O adresă IPv4 are două părți: <strong>partea de rețea</strong> și <strong>partea de gazdă</strong>. Granița dintre ele este dată de <em>masca de subrețea</em>, scrisă fie ca <code>255.255.255.0</code>, fie în notație CIDR <code>/24</code> (= primii 24 de biți sunt pentru rețea).</p>
+  <pre><code>IP:    192.168.1.10
+Mască: 255.255.255.0  (/24)
+       └────────┘ └─┘
+        rețea   gazdă
+Rețea:  192.168.1.0
+Broad.: 192.168.1.255
+Gazde utile: 192.168.1.1 — 192.168.1.254 (254 adrese)</code></pre>
+
+  <h3>Adrese private (RFC 1918)</h3>
+  <p>Anumite intervale sunt rezervate pentru uz intern, nu sunt rutabile pe Internet:</p>
+  <ul>
+    <li><code>10.0.0.0/8</code> — folosit de organizații mari</li>
+    <li><code>172.16.0.0/12</code> — intermediar</li>
+    <li><code>192.168.0.0/16</code> — tipic pentru routere de casă</li>
+  </ul>
+
+  <h2>2. NAT — magia routerului de casă</h2>
+  <p>În rețeaua ta de acasă există probabil 5–10 dispozitive cu adrese <code>192.168.x.x</code>, dar ai <em>o singură</em> adresă IP publică oferită de furnizor. Cum face routerul ca toate să iasă simultan pe Internet?</p>
+  <p>Răspuns: <strong>NAT</strong> (Network Address Translation). Routerul ține un <em>tabel de traducere</em> și rescrie pachetele:</p>
+  <pre><code>Laptop  192.168.1.10:54123  ─┐
+Telefon 192.168.1.11:54123  ─┼─→ Router ─→  IP public 86.xx.xx.xx:port
+TV      192.168.1.12:54123  ─┘                      (port diferit per conexiune)</code></pre>
+  <p>Routerul atribuie fiecărei conexiuni un <em>port public</em> unic, astfel încât răspunsurile să poată fi rutate înapoi la dispozitivul corect.</p>
+
+  <h2>3. TCP — three-way handshake</h2>
+  <p>Înainte ca TCP să transmită date, clientul și serverul fac un „salut" în 3 timpi care stabilește o sesiune fiabilă:</p>
+
+  <svg class="diag" viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg">
+    <rect class="box" x="40" y="20" width="120" height="36" rx="6"/>
+    <text x="100" y="44" text-anchor="middle" font-weight="700">Client</text>
+    <rect class="box" x="400" y="20" width="120" height="36" rx="6"/>
+    <text x="460" y="44" text-anchor="middle" font-weight="700">Server</text>
+    <line x1="100" y1="56" x2="100" y2="200"/>
+    <line x1="460" y1="56" x2="460" y2="200"/>
+    <line x1="100" y1="90" x2="455" y2="105" marker-end="url(#arr1)"/>
+    <text x="280" y="85" text-anchor="middle" font-family="JetBrains Mono" font-size="13">1. SYN (seq=x)</text>
+    <line x1="460" y1="130" x2="105" y2="145" marker-end="url(#arr1)"/>
+    <text x="280" y="125" text-anchor="middle" font-family="JetBrains Mono" font-size="13">2. SYN-ACK (seq=y, ack=x+1)</text>
+    <line x1="100" y1="170" x2="455" y2="185" marker-end="url(#arr1)"/>
+    <text x="280" y="165" text-anchor="middle" font-family="JetBrains Mono" font-size="13">3. ACK (ack=y+1) → conexiune deschisă</text>
+    <defs>
+      <marker id="arr1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 z" fill="currentColor" style="fill: var(--accent-2)"/>
+      </marker>
+    </defs>
+  </svg>
+
+  <p>După acest dialog, conexiunea este <strong>stabilită</strong>. Mai există un dialog similar în 4 timpi (FIN/ACK × 2) pentru închiderea ordonată.</p>
+
+  <h3>De ce TCP este „fiabil"?</h3>
+  <ul>
+    <li><strong>Numere de secvență</strong> — fiecare octet primește un număr; receptorul poate detecta pierderi sau reordonări.</li>
+    <li><strong>Confirmări (ACK)</strong> — receptorul confirmă ce a primit; ce nu e confirmat se retransmite.</li>
+    <li><strong>Control de flux</strong> (sliding window) — receptorul îi spune emițătorului cât poate primi fără să se înece.</li>
+    <li><strong>Control de congestie</strong> — emițătorul își reduce rata dacă detectează pierderi (semn de aglomerație în rețea).</li>
+  </ul>
+
+  <h2>4. UDP — fără ceremonie</h2>
+  <p>UDP (User Datagram Protocol) este opusul filozofic al lui TCP: <em>fire and forget</em>. Trimite datagrama, fără handshake, fără confirmări, fără retransmisii. Antetul are doar 8 octeți (vs. 20+ la TCP).</p>
+  <div class="cols-2">
+    <div class="col-card">
+      <h4>Când folosim TCP?</h4>
+      <ul>
+        <li>Pagini web (HTTP/HTTPS)</li>
+        <li>Transfer de fișiere</li>
+        <li>Email</li>
+        <li>SSH</li>
+      </ul>
+      <p style="margin:0; font-size:.88rem; color:var(--ink-mute)">Acolo unde pierderea unui pachet = date corupte.</p>
+    </div>
+    <div class="col-card">
+      <h4>Când folosim UDP?</h4>
+      <ul>
+        <li>DNS (cerere rapidă, o întrebare)</li>
+        <li>Streaming video / VoIP</li>
+        <li>Jocuri multiplayer</li>
+        <li>NTP (sincronizare timp)</li>
+      </ul>
+      <p style="margin:0; font-size:.88rem; color:var(--ink-mute)">Acolo unde latența contează mai mult decât pierderea unui cadru.</p>
+    </div>
+  </div>
+
+  <h3>Activitatea 2 · Citește un antet IP</h3>
+  <p>În Wireshark (lecția 7) vei vedea antete reale. Iată unul simplificat:</p>
+  <pre><code>Source IP:      192.168.1.10
+Destination IP: 142.250.200.46  (google.com)
+TTL:            64
+Protocol:       6 (TCP)
+Total Length:   60 bytes</code></pre>
+  <p><strong>Întrebare:</strong> ce înseamnă TTL = 64? <em>Răspuns:</em> Time To Live — pachetul poate trece prin maximum 64 de routere (hop-uri); fiecare router scade 1. Dacă ajunge la 0, pachetul e aruncat și se trimite un ICMP „Time Exceeded" înapoi. Comanda <code>traceroute</code> folosește exact acest mecanism pentru a descoperi traseul.</p>
+
+  <div class="callout">
+    <strong>🧪 Mini-laborator opțional</strong>
+    Pe Linux/macOS: rulează <code>traceroute 8.8.8.8</code>. Pe Windows: <code>tracert 8.8.8.8</code>. Vei vedea fiecare router prin care trece pachetul tău spre serverul DNS public Google.
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>IPv4</strong> = 32 biți, scris ca 4 octeți zecimali (0–255). <strong>IPv6</strong> = 128 biți, scris hexazecimal.</li>
+      <li><strong>Notația CIDR</strong>: <code>/24</code> = primii 24 de biți sunt parte de rețea, restul de 8 biți sunt pentru gazde.</li>
+      <li><strong>Adrese private RFC 1918:</strong> <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>.</li>
+      <li><strong>Three-way handshake TCP:</strong> SYN → SYN-ACK → ACK (în această ordine).</li>
+      <li><strong>TCP</strong> = fiabil, ordonat, cu confirmări (web, mail, SSH). <strong>UDP</strong> = rapid, fără confirmări (DNS, streaming, jocuri).</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l1')">← L1</button>
+    <button class="btn" onclick="go('l3')">Următoarea: DNS →</button>
+  </div>
+</section>
+
+<!-- ================ L3: DNS ================ -->
+<section id="sec-l3" class="section">
+  <div class="kicker">LECȚIA 3 · CS 2.1</div>
+  <h1>DNS — agenda Internetului</h1>
+  <p class="lead">Oamenii memorează „<code>wikipedia.org</code>". Calculatoarele înțeleg „<code>208.80.154.224</code>". DNS (Domain Name System) este sistemul global care traduce între cele două. Este o componentă fundamentală: în cazul unei defecțiuni a infrastructurii DNS, accesul la servicii web devine indisponibil pentru utilizatori chiar dacă serverele aplicațiilor funcționează normal.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să descrii structura ierarhică a numelor DNS (rădăcină → TLD → autoritativ);</li>
+      <li>să explici pașii unei interogări DNS recursive;</li>
+      <li>să recunoști principalele tipuri de înregistrări (A, AAAA, CNAME, MX, TXT, NS);</li>
+      <li>să identifici trei riscuri de securitate DNS și mecanismele moderne de apărare (DNSSEC, DoH, DoT).</li>
+    </ul>
+  </div>
+
+  <h2>1. De ce nu ținem doar un fișier cu toate numele?</h2>
+  <p>În anii '70, exact asta se făcea: un singur fișier <code>HOSTS.TXT</code> ținut la Stanford era copiat manual pe fiecare gazdă. Cu câteva sute de calculatoare în ARPANET, mergea. Cu miliarde de dispozitive astăzi, e imposibil.</p>
+  <p>Soluția lui Paul Mockapetris (1983): un sistem <strong>distribuit, ierarhic și cu cache</strong>. Niciun server nu cunoaște tot; fiecare cunoaște o felie și știe pe cine să întrebe în continuare.</p>
+
+  <h2>2. Ierarhia numelor</h2>
+  <p>Citește un nume de domeniu <strong>de la dreapta la stânga</strong>:</p>
+  <pre><code>www.scoala.edu.ro.
+└──┘ └────┘ └─┘└─┘└─ punct invizibil = rădăcina
+ │     │    │   │
+ │     │    │   └── TLD național (Top-Level Domain)
+ │     │    └────── TLD de tipul instituției
+ │     └─────────── domeniul de nivel 2 (înregistrat de școală)
+ └───────────────── subdomeniu (configurat de școală)</code></pre>
+
+  <table class="tbl">
+    <thead><tr><th>Nivel</th><th>Cine îl gestionează</th></tr></thead>
+    <tbody>
+      <tr><td>Rădăcina (.)</td><td>13 servere root (logic; fizic, mii de instanțe via anycast)</td></tr>
+      <tr><td>TLD (.ro, .com, .org…)</td><td>Registries naționale / internaționale (.ro = RoTLD / ICI București)</td></tr>
+      <tr><td>Domeniul de nivel 2</td><td>Cel care îl înregistrează (firma, școala, persoana)</td></tr>
+      <tr><td>Subdomenii</td><td>Proprietarul domeniului</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Cum se desfășoară o interogare DNS</h2>
+  <p>Când scrii <code>scoala.edu.ro</code> în browser, se întâmplă (simplificat) acest dialog în spate:</p>
+
+  <ol>
+    <li>Browserul întreabă <strong>resolverul local</strong> (de obicei al furnizorului de Internet, sau 8.8.8.8 / 1.1.1.1).</li>
+    <li>Dacă resolverul nu are răspunsul în cache, întreabă un <strong>server root</strong>: „cine știe de .ro?".</li>
+    <li>Serverul root răspunde cu adresele serverelor <strong>TLD .ro</strong>.</li>
+    <li>Resolverul întreabă serverul .ro: „cine știe de scoala.edu.ro?".</li>
+    <li>TLD-ul răspunde cu serverele <strong>autoritative</strong> ale domeniului.</li>
+    <li>Resolverul întreabă serverul autoritativ și primește IP-ul final.</li>
+    <li>Răspunsul ajunge la browser și se salvează în cache pentru următoarea cerere (TTL).</li>
+  </ol>
+
+  <h2>4. Tipuri de înregistrări DNS</h2>
+  <table class="tbl">
+    <thead><tr><th>Tip</th><th>Conține</th><th>Utilizat pentru</th></tr></thead>
+    <tbody>
+      <tr><td><code>A</code></td><td>Adresă IPv4</td><td>Mapare nume → IPv4</td></tr>
+      <tr><td><code>AAAA</code></td><td>Adresă IPv6</td><td>Mapare nume → IPv6</td></tr>
+      <tr><td><code>CNAME</code></td><td>Alt nume (alias)</td><td>www.exemplu.ro → exemplu.ro</td></tr>
+      <tr><td><code>MX</code></td><td>Mail eXchanger</td><td>Server de email pentru domeniu</td></tr>
+      <tr><td><code>TXT</code></td><td>Text liber</td><td>SPF, DKIM, verificări de proprietate</td></tr>
+      <tr><td><code>NS</code></td><td>Name Server</td><td>Cine este autoritativ pentru zonă</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>🧪 Verifică în terminal</strong>
+    <code>dig scoala.edu.ro</code> sau <code>nslookup scoala.edu.ro</code> îți arată exact ce înregistrări DNS există pentru un domeniu. <code>dig MX gmail.com</code> îți arată serverele de mail Gmail.
+  </div>
+
+  <h2>5. Riscuri de securitate DNS</h2>
+
+  <h3>DNS spoofing / cache poisoning</h3>
+  <p>Atacatorul reușește să injecteze un răspuns DNS fals în cache-ul resolverului. Rezultat: când întrebi de <code>banca.ro</code>, primești IP-ul unui site fals controlat de atacator. Vezi adresa corectă în bara de browser, dar ești pe alt server.</p>
+
+  <h3>DNS hijacking</h3>
+  <p>Atacatorul preia controlul asupra contului tău la registrar (firma de unde ai cumpărat domeniul) sau asupra serverului tău DNS și redirecționează traficul. S-a întâmplat la nivel național — în 2018, mai multe domenii guvernamentale au fost redirecționate prin atacuri de acest tip.</p>
+
+  <h3>DNS tunneling</h3>
+  <p>Atacatorii pot folosi DNS pentru a <em>contrabanda</em> date prin firewall: codifică informația în interogări <code>subdomeniu-foarte-lung-cu-date-codate.atacator.ro</code>. DNS-ul iese aproape întotdeauna prin firewall, așa că datele scapă fără să fie observate fără reguli speciale.</p>
+
+  <div class="callout warn">
+    <strong>🛡️ Apărări moderne</strong>
+    <strong>DNSSEC</strong> adaugă semnături criptografice la răspunsurile DNS, prevenind spoofing-ul. <strong>DoH</strong> (DNS over HTTPS) și <strong>DoT</strong> (DNS over TLS) criptează interogările între tine și resolver, prevenind interceptarea și manipularea pe traseu.
+  </div>
+
+  <h3>Activitatea 3 · Analizează un atac real</h3>
+  <p>În 2016, atacul Mirai DDoS împotriva furnizorului DNS <strong>Dyn</strong> a doborât pentru câteva ore Twitter, Spotify, Netflix, GitHub, Reddit și multe altele. Niciunul dintre aceste servicii nu fusese atacat direct.</p>
+  <p><strong>Întrebare de reflecție:</strong> de ce a căzut Twitter dacă serverele Twitter funcționau perfect? Răspunde în 2–3 propoziții pe caiet.</p>
+
+  <div class="callout ok">
+    <strong>✅ Ghid de răspuns</strong>
+    Browserele utilizatorilor încercau să rezolve <code>twitter.com</code> → adresă IP. Resolverele întrebau serverele autoritative ale Dyn. Serverele Dyn erau bombardate de cereri false (Mirai folosea o rețea de zeci de mii de camere IoT compromise) și nu mai răspundeau. Fără IP, browserul nu putea ajunge la Twitter — deși Twitter funcționa perfect. DNS-ul era „single point of failure".
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>DNS</strong> = sistem distribuit, ierarhic, cu cache, pentru rezoluția numelor în adrese IP.</li>
+      <li><strong>Ordinea interogării:</strong> resolver local → root → TLD → server autoritativ.</li>
+      <li><strong>Tipuri de înregistrări esențiale:</strong> A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail), NS (autoritativ).</li>
+      <li><strong>Trei amenințări tipice:</strong> spoofing/cache poisoning, hijacking la registrar, tunneling prin DNS.</li>
+      <li><strong>Apărări moderne:</strong> DNSSEC (semnături), DoH (DNS over HTTPS), DoT (DNS over TLS).</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l2')">← L2</button>
+    <button class="btn" onclick="go('l4')">Următoarea: DDoS →</button>
+  </div>
+</section>
+
+<!-- ================ L4: DDoS ================ -->
+<section id="sec-l4" class="section">
+  <div class="kicker">LECȚIA 4 · CS 2.2</div>
+  <h1>Atacuri DDoS, explicate</h1>
+  <p class="lead">DoS = Denial of Service. DDoS = <em>Distributed</em> Denial of Service — același obiectiv (a face un serviciu indisponibil), dar realizat din mii sau milioane de surse simultan. Este una dintre cele mai vechi și mai dificile probleme din securitatea cibernetică.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să clasifici atacurile DDoS în cele trei familii (volumetric, protocol, aplicație);</li>
+      <li>să explici mecanismul unui SYN flood folosind cunoștințele despre handshake-ul TCP;</li>
+      <li>să descrii principiul amplificării și să dai 2 exemple concrete;</li>
+      <li>să enumeri minimum 3 măsuri de apărare împotriva DDoS;</li>
+      <li>să recunoști cadrul legal aplicabil în România (Codul penal, art. 363).</li>
+    </ul>
+  </div>
+
+  <h2>1. Analogie</h2>
+  <p>Imaginează un restaurant cu 50 de mese. În mod normal, clienții vin, mănâncă, pleacă. Într-o zi sosesc <strong>10 000 de oameni</strong>, blochează intrarea, ocupă toate scaunele fără să comande nimic și nu pleacă. Clienții reali nu mai pot intra. Atât de simplu — și exact așa funcționează un DDoS volumetric.</p>
+
+  <h2>2. Cele trei mari familii de DDoS</h2>
+
+  <div class="cols-3">
+    <div class="col-card">
+      <h4>Volumetric</h4>
+      <p>Saturează lățimea de bandă a victimei cu trafic uriaș (Gbps, Tbps).</p>
+      <p><strong>Exemple:</strong> UDP flood, ICMP flood, amplificare DNS/NTP.</p>
+      <p><strong>Măsură:</strong> bits/sec.</p>
+    </div>
+    <div class="col-card">
+      <h4>Protocol</h4>
+      <p>Exploatează slăbiciuni ale protocoalelor de transport pentru a epuiza resursele rețelei sau ale dispozitivelor intermediare.</p>
+      <p><strong>Exemple:</strong> SYN flood, Ping of Death, Smurf.</p>
+      <p><strong>Măsură:</strong> packets/sec.</p>
+    </div>
+    <div class="col-card">
+      <h4>Aplicație (L7)</h4>
+      <p>Trafic „aparent legitim" care însă forțează aplicația să facă operații foarte costisitoare.</p>
+      <p><strong>Exemple:</strong> HTTP flood, Slowloris.</p>
+      <p><strong>Măsură:</strong> requests/sec.</p>
+    </div>
+  </div>
+
+  <h2>3. SYN flood — cum funcționează concret</h2>
+  <p>Amintește-ți three-way handshake-ul TCP din L2: SYN → SYN-ACK → ACK. Serverul, după ce primește SYN, alocă o intrare într-o tabelă internă (<em>half-open connections</em>) și așteaptă ACK-ul final.</p>
+  <p>Într-un SYN flood:</p>
+  <ol>
+    <li>Atacatorul trimite mii de SYN-uri, fiecare cu adresă sursă <em>falsificată</em>.</li>
+    <li>Serverul răspunde cu SYN-ACK către adresele false și alocă resurse pentru fiecare.</li>
+    <li>ACK-ul final nu mai vine niciodată (adresele sunt false sau nu există).</li>
+    <li>Tabela de half-open se umple. Clienți reali nu mai pot deschide conexiuni — fără resurse.</li>
+  </ol>
+
+  <h2>4. Amplificare — efectul de pârghie</h2>
+  <p>Cum trimite un atacator 1 Tbps de trafic dacă el însuși are doar 100 Mbps? Răspuns: <strong>amplificare</strong>. Folosește servicii care răspund <em>mult mai mult</em> decât li se cere, și falsifică sursa cererii astfel încât răspunsul să ajungă la victimă.</p>
+
+  <pre><code>Atacator (sursă: VICTIMA) ──small── DNS query ───→ Server DNS public
+                                                          │
+Victima  ←────────── răspuns DNS amplificat de 50× ───────┘</code></pre>
+
+  <p>Factori tipici de amplificare:</p>
+  <ul>
+    <li>DNS deschis: ×28 până la ×54</li>
+    <li>NTP <code>monlist</code>: până la ×556</li>
+    <li>Memcached neprotejat: până la ×51 000 (record istoric, GitHub 2018, 1,35 Tbps)</li>
+  </ul>
+
+  <h2>5. Botnet-uri</h2>
+  <p>Forța bruta în DDoS vine din <strong>botnet-uri</strong> — rețele de dispozitive compromise, controlate de la distanță. Pot fi: calculatoare personale infectate, servere prost configurate, sau (din ce în ce mai des) dispozitive IoT prost securizate (camere IP, routere de casă, frigidere „smart").</p>
+  <p><strong>Mirai</strong> (2016) este botnet-ul-icon: a infectat sute de mii de camere IP care veneau din fabrică cu parole default (<code>admin/admin</code>). Atacurile pe care le-a generat au depășit 1 Tbps și au doborât servicii majore. Codul sursă Mirai a fost ulterior publicat — variante derivate circulă și astăzi.</p>
+
+  <h2>6. Apărare în profunzime</h2>
+
+  <table class="tbl">
+    <thead><tr><th>Tehnică</th><th>Ce face</th></tr></thead>
+    <tbody>
+      <tr><td>Rate limiting</td><td>Limitează numărul de cereri pe IP/secundă. Bun contra HTTP flood ușor.</td></tr>
+      <tr><td>SYN cookies</td><td>Serverul nu alocă resurse pentru SYN-uri până nu primește ACK-ul valid. Mitigare clasică pentru SYN flood.</td></tr>
+      <tr><td>Anycast + CDN</td><td>Aceeași adresă IP răspunde din zeci de centre globale. Traficul atacatorului se „dilutează" geografic.</td></tr>
+      <tr><td>Scrubbing centers</td><td>Operatori specializați (Cloudflare, Akamai, Arbor) absorb traficul, filtrează partea malicioasă, lasă să treacă doar restul.</td></tr>
+      <tr><td>BCP 38 (ingress filtering)</td><td>Furnizorii ar trebui să refuze pachete cu adrese sursă falsificate. Adoptat parțial — dacă ar fi universal, amplificarea ar dispărea.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout danger">
+    <strong>⚠️ DDoS este ilegal în România</strong>
+    Conform Codului penal român, art. 363 („Perturbarea funcționării sistemelor informatice"), un atac DDoS împotriva unui sistem fără autorizare se pedepsește cu închisoare de la 2 la 7 ani. Inclusiv plata pentru un serviciu „stresser" / „booter" este faptă penală. Nu există „doar o glumă" în această zonă.
+  </div>
+
+  <h3>Activitatea 4 · Studiu de caz</h3>
+  <p>Caută online despre <strong>atacul DDoS asupra Estoniei din 2007</strong>. Răspunde:</p>
+  <ol>
+    <li>Ce instituții au fost vizate?</li>
+    <li>De ce este considerat un punct de cotitură în securitatea cibernetică internațională?</li>
+    <li>Ce instituție internațională s-a creat ulterior în Estonia ca răspuns?</li>
+  </ol>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>3 familii DDoS:</strong> volumetric (Gbps), protocol (SYN flood), aplicație/L7 (HTTP flood).</li>
+      <li><strong>SYN flood</strong> = se umple tabela de conexiuni half-open ale serverului.</li>
+      <li><strong>Amplificarea</strong> = atacatorul falsifică sursa și forțează un server intermediar să răspundă mai mult către victimă.</li>
+      <li><strong>Botnet</strong> = rețea de dispozitive compromise (ex: Mirai — camere IoT).</li>
+      <li><strong>Apărare:</strong> rate limiting, SYN cookies, anycast/CDN, scrubbing centers, BCP 38.</li>
+      <li><strong>Atenție:</strong> în România, DDoS fără autorizare = infracțiune, art. 363 Cod penal.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l3')">← L3</button>
+    <button class="btn" onclick="go('l5')">Următoarea: Recapitulare →</button>
+  </div>
+</section>
+
+<!-- ================ L5: RECAPITULARE ================ -->
+<section id="sec-l5" class="section">
+  <div class="kicker">LECȚIA 5</div>
+  <h1>Recapitulare intermediară</h1>
+  <p class="lead">Ai parcurs jumătate de curs. Înainte de a intra în partea practică (firewall, Wireshark, Linux, CTF), iată o sinteză a celor patru concepte fundamentale.</p>
+
+  <h2>1. Mind-map L1–L4</h2>
+
+  <div class="cols-2">
+    <div class="col-card">
+      <h4>L1 · Protocoale</h4>
+      <ul>
+        <li>OSI = 7 niveluri (teoretic)</li>
+        <li>TCP/IP = 4 niveluri (practic)</li>
+        <li>Încapsulare ↓, de-încapsulare ↑</li>
+        <li>Porturi multiplexează aplicațiile</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>L2 · TCP/IP</h4>
+      <ul>
+        <li>IPv4 (32 biți) / IPv6 (128 biți)</li>
+        <li>CIDR <code>/24</code>, RFC 1918, NAT</li>
+        <li>TCP = fiabil (3-way handshake)</li>
+        <li>UDP = rapid și fără ceremonie</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>L3 · DNS</h4>
+      <ul>
+        <li>Ierarhic: rădăcină → TLD → autoritativ</li>
+        <li>Cache + TTL pentru viteză</li>
+        <li>Tipuri: A, AAAA, CNAME, MX, TXT, NS</li>
+        <li>Riscuri: spoofing, hijacking, tunneling</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>L4 · DDoS</h4>
+      <ul>
+        <li>Volumetric / protocol / aplicație</li>
+        <li>SYN flood, amplificare DNS/NTP</li>
+        <li>Botnet-uri (Mirai, IoT)</li>
+        <li>Apărare: SYN cookies, anycast, scrubbing</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. Quiz de control (5 întrebări)</h2>
+  <p style="color:var(--ink-mute); font-size:.9rem">Răspunsurile se verifică imediat. Nu contează pentru certificat — e doar pentru tine.</p>
+
+  <div class="quiz-q" data-correct="2">
+    <h4>1. La ce nivel OSI lucrează TCP?</h4>
+    <label class="quiz-opt"><input type="radio" name="q-r1" hidden> a) Aplicație (7)</label>
+    <label class="quiz-opt"><input type="radio" name="q-r1" hidden> b) Rețea (3)</label>
+    <label class="quiz-opt"><input type="radio" name="q-r1" hidden> c) Transport (4)</label>
+    <label class="quiz-opt"><input type="radio" name="q-r1" hidden> d) Legătură de date (2)</label>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz-q" data-correct="1">
+    <h4>2. Adresa <code>192.168.1.10</code> este…</h4>
+    <label class="quiz-opt"><input type="radio" name="q-r2" hidden> a) o adresă IPv6</label>
+    <label class="quiz-opt"><input type="radio" name="q-r2" hidden> b) o adresă privată (RFC 1918), nerutabilă pe Internet</label>
+    <label class="quiz-opt"><input type="radio" name="q-r2" hidden> c) o adresă publică rezervată Google</label>
+    <label class="quiz-opt"><input type="radio" name="q-r2" hidden> d) un nume de domeniu</label>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz-q" data-correct="0">
+    <h4>3. În DNS, înregistrarea <code>MX</code> indică…</h4>
+    <label class="quiz-opt"><input type="radio" name="q-r3" hidden> a) serverul de mail al domeniului</label>
+    <label class="quiz-opt"><input type="radio" name="q-r3" hidden> b) un alias pentru alt nume</label>
+    <label class="quiz-opt"><input type="radio" name="q-r3" hidden> c) adresa IPv6 a serverului</label>
+    <label class="quiz-opt"><input type="radio" name="q-r3" hidden> d) cheia publică DNSSEC</label>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz-q" data-correct="3">
+    <h4>4. Un SYN flood este un atac de tip…</h4>
+    <label class="quiz-opt"><input type="radio" name="q-r4" hidden> a) phishing</label>
+    <label class="quiz-opt"><input type="radio" name="q-r4" hidden> b) injecție SQL</label>
+    <label class="quiz-opt"><input type="radio" name="q-r4" hidden> c) DDoS volumetric pur</label>
+    <label class="quiz-opt"><input type="radio" name="q-r4" hidden> d) DDoS la nivel de protocol (TCP)</label>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="quiz-q" data-correct="2">
+    <h4>5. De ce a căzut Twitter în atacul Dyn 2016?</h4>
+    <label class="quiz-opt"><input type="radio" name="q-r5" hidden> a) Serverele Twitter au fost atacate direct</label>
+    <label class="quiz-opt"><input type="radio" name="q-r5" hidden> b) Twitter și-a oprit serviciul voluntar</label>
+    <label class="quiz-opt"><input type="radio" name="q-r5" hidden> c) DNS-ul Dyn (folosit de Twitter) a fost atacat — fără DNS, browserele nu mai găseau IP-ul</label>
+    <label class="quiz-opt"><input type="radio" name="q-r5" hidden> d) Furnizorul de Internet al Twitter a picat</label>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <button class="btn" onclick="checkRecap()">Verifică răspunsurile</button>
+  <p id="recap-score" style="margin-top:12px; font-family: var(--mono); color: var(--accent);"></p>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l4')">← L4</button>
+    <button class="btn" onclick="go('l6')">Următoarea: Firewall →</button>
+  </div>
+</section>
+
+<!-- ================ L6: FIREWALL ================ -->
+<section id="sec-l6" class="section">
+  <div class="kicker">LECȚIA 6 · CS 3.1</div>
+  <h1>Firewall — controlul traficului</h1>
+  <p class="lead">Un firewall este un dispozitiv (fizic sau software) care examinează fiecare pachet care intră sau iese dintr-o rețea și decide: <strong>permit</strong> sau <strong>refuz</strong>. Este prima linie de apărare a oricărei rețele moderne.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să descrii cele 4 generații de firewall-uri și diferențele dintre ele;</li>
+      <li>să argumentezi de ce filozofia default-deny este preferabilă default-allow;</li>
+      <li>să scrii reguli simple de tip iptables pentru un server (politică implicită + reguli specifice);</li>
+      <li>să schițezi o arhitectură DMZ clasică în 3 zone;</li>
+      <li>să identifici limitele unui firewall (HTTPS, amenințări interne, 0-day).</li>
+    </ul>
+  </div>
+
+  <h2>1. Generații de firewall-uri</h2>
+
+  <table class="tbl">
+    <thead><tr><th>Generație</th><th>Cum decide</th><th>Limitări</th></tr></thead>
+    <tbody>
+      <tr><td>1. Packet filter</td><td>Reguli statice pe IP sursă/destinație, port, protocol</td><td>Nu „știe" dacă pachetul face parte dintr-o conexiune legitimă deschisă</td></tr>
+      <tr><td>2. Stateful inspection</td><td>Ține o <em>tabelă de conexiuni</em> și decide în context</td><td>Nu se uită în interiorul aplicației</td></tr>
+      <tr><td>3. Application-layer (proxy)</td><td>Înțelege protocoale L7 (HTTP, FTP, SMTP) și poate filtra pe conținut</td><td>Mai lent, costisitor</td></tr>
+      <tr><td>4. Next-Generation (NGFW)</td><td>Stateful + IDS/IPS + identificare aplicație + filtrare TLS</td><td>Complex de configurat corect</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. Filozofia regulilor: default-deny vs. default-allow</h2>
+
+  <div class="cols-2">
+    <div class="col-card">
+      <h4>✅ Default-deny (corect)</h4>
+      <p>Tot ce nu este permis explicit este refuzat. Lista albă.</p>
+      <pre><code>ALLOW: tcp/443 din intern
+ALLOW: tcp/80  din intern
+DENY:  *  (regulă finală implicită)</code></pre>
+    </div>
+    <div class="col-card">
+      <h4>❌ Default-allow (greșit)</h4>
+      <p>Tot ce nu este interzis explicit este permis. Lista neagră.</p>
+      <pre><code>DENY:  tcp/23 (Telnet)
+DENY:  tcp/445 (SMB)
+ALLOW: * (regulă finală implicită)</code></pre>
+      <p style="margin-top:6px; font-size:.85rem; color:var(--ink-mute)">Nu poți enumera tot ce e periculos. Vor exista mereu surprize.</p>
+    </div>
+  </div>
+
+  <h2>3. iptables / nftables — Linux în acțiune</h2>
+  <p>Pe Linux, firewall-ul nativ este <code>iptables</code> (înlocuit treptat de <code>nftables</code>). Iată câteva reguli tipice pentru un server web:</p>
+
+  <pre><code># Politica implicită: refuză tot ce intră, permite tot ce iese
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
+# Permite conexiuni deja stabilite (stateful!)
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Permite loopback (procesele locale comunică între ele)
+iptables -A INPUT -i lo -j ACCEPT
+
+# Permite SSH (port 22) — atenție: limitează la IP-uri cunoscute în producție!
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Permite HTTP și HTTPS de oriunde
+iptables -A INPUT -p tcp --dport 80  -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Refuză și loghează restul
+iptables -A INPUT -j LOG --log-prefix "FW-DROP: "
+iptables -A INPUT -j DROP</code></pre>
+
+  <div class="callout">
+    <strong>📖 Citește regulile ca o conversație</strong>
+    „Refuz tot ce intră, în afară de: conexiunile pe care eu însumi le-am început, traficul loopback, și conexiuni noi pe porturile 22, 80, 443. Orice altceva — refuz și notez în log.”
+  </div>
+
+  <h2>4. DMZ — zona demilitarizată</h2>
+  <p>O arhitectură clasică în 3 zone, folosită de aproape toate organizațiile cu prezență publică:</p>
+
+  <svg class="diag" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+    <text x="60"  y="20" text-anchor="middle" font-weight="700">Internet</text>
+    <text x="280" y="20" text-anchor="middle" font-weight="700">DMZ</text>
+    <text x="510" y="20" text-anchor="middle" font-weight="700">LAN intern</text>
+    <rect class="box" x="10"  y="40" width="100" height="60" rx="6"/>
+    <text x="60" y="76" text-anchor="middle">utilizatori</text>
+    <rect class="box" x="230" y="40" width="100" height="60" rx="6"/>
+    <text x="280" y="65" text-anchor="middle">web server</text>
+    <text x="280" y="85" text-anchor="middle">mail relay</text>
+    <rect class="box" x="450" y="40" width="120" height="60" rx="6"/>
+    <text x="510" y="65" text-anchor="middle">baze de date</text>
+    <text x="510" y="85" text-anchor="middle">stații angajați</text>
+    <rect x="150" y="40" width="14" height="60" rx="3" style="fill: var(--warn)"/>
+    <text x="157" y="125" text-anchor="middle" font-size="11">FW1</text>
+    <rect x="380" y="40" width="14" height="60" rx="3" style="fill: var(--warn)"/>
+    <text x="387" y="125" text-anchor="middle" font-size="11">FW2</text>
+    <text x="300" y="170" text-anchor="middle" font-size="12" style="fill: var(--ink-dim)">Internet ↔ DMZ: permis pentru 80/443. DMZ ↔ LAN: doar conexiunile strict necesare.</text>
+    <text x="300" y="195" text-anchor="middle" font-size="12" style="fill: var(--ink-dim)">Internet ↔ LAN direct: complet interzis.</text>
+  </svg>
+
+  <p>Dacă atacatorul compromite serverul web din DMZ, accesul lui spre rețeaua internă rămâne strict limitat — el a sărit primul gard, dar mai are unul.</p>
+
+  <h2>5. Limitele firewall-ului</h2>
+  <ul>
+    <li><strong>Trafic criptat (HTTPS):</strong> firewall-ul vede „TCP/443 spre IP X", dar nu vede conținutul. NGFW-urile fac „TLS inspection" — interceptează și redescifrează, ceea ce ridică probleme de confidențialitate.</li>
+    <li><strong>Amenințări de la utilizatori autentificați:</strong> dacă un angajat dă click pe un atașament cu malware, firewall-ul nu va opri exfiltrarea ulterioară prin canale aparent legitime.</li>
+    <li><strong>0-day exploits:</strong> firewall-ul nu poate proteja împotriva unei vulnerabilități încă necunoscute în software-ul pe care îl protejează.</li>
+  </ul>
+
+  <div class="callout warn">
+    <strong>💡 Firewall ≠ securitate completă</strong>
+    Firewall-ul este o piesă esențială, dar nu suficientă. Apărarea în profunzime (<em>defense in depth</em>) presupune mai multe straturi: firewall + IDS/IPS + EDR pe endpoint-uri + segmentare de rețea + actualizări la zi + educație utilizatori.
+  </div>
+
+  <h3>Activitatea 5 · Proiectează reguli</h3>
+  <p>Imaginează că ești administratorul școlii. Scrie pe caiet 5 reguli de firewall (în format <code>ACCEPT/DROP, port, sursă, destinație</code>) pentru rețeaua sălii de informatică, știind că:</p>
+  <ul>
+    <li>elevii trebuie să acceseze web (HTTP, HTTPS) și serverul școlii (port 22 SSH);</li>
+    <li>nimeni nu trebuie să poată folosi BitTorrent (porturi 6881–6889);</li>
+    <li>doar profesorul (la stația 10.0.0.5) poate ajunge pe serverul DB intern (port 3306).</li>
+  </ul>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>4 generații:</strong> packet filter → stateful → application-layer (proxy) → NGFW.</li>
+      <li><strong>Default-deny</strong> = principiul corect: tot ce nu e permis explicit, e refuzat.</li>
+      <li><strong>Stateful</strong> = firewall-ul ține o tabelă cu conexiunile active și aplică reguli contextuale.</li>
+      <li><strong>DMZ</strong> = zonă intermediară între Internet și LAN, unde stau serverele publice (web, mail).</li>
+      <li><strong>Firewall ≠ securitate completă:</strong> nu vede HTTPS criptat, nu oprește atacuri din interior, nu cunoaște 0-day.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l5')">← L5</button>
+    <button class="btn" onclick="go('l7')">Următoarea: Wireshark →</button>
+  </div>
+</section>
+
+<!-- ================ L7: WIRESHARK ================ -->
+<section id="sec-l7" class="section">
+  <div class="kicker">LECȚIA 7 · CS 3.2</div>
+  <h1>Wireshark — demo de analiză a traficului</h1>
+  <p class="lead">Wireshark este un analizor de protocoale de rețea gratuit și open-source, larg utilizat în industrie pentru diagnoză, depanare și investigații de securitate. Permite inspecția fiecărui pachet care trece prin interfața de rețea — un instrument legitim pentru administratori, dar și potențial periculos dacă este folosit fără autorizare.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să descrii cele 3 zone principale ale interfeței Wireshark;</li>
+      <li>să interpretezi o secvență de pachete (DNS + handshake TCP + HTTP) într-o captură;</li>
+      <li>să scrii cel puțin 3 filtre Wireshark pentru cazuri concrete (HTTP, SYN inițiale, IP specific);</li>
+      <li>să identifici tipare suspecte: port scanning, beaconing, exfiltrare DNS;</li>
+      <li>să respecți cadrul legal — interceptare doar pe rețele proprii sau cu autorizare scrisă.</li>
+    </ul>
+  </div>
+
+  <div class="callout danger">
+    <strong>⚠️ Etica analizei de trafic</strong>
+    Folosirea Wireshark pentru a intercepta traficul altora — la școală, în rețele Wi-Fi publice, sau acasă pe rețeaua altcuiva — fără autorizare scrisă este <strong>infracțiune</strong> (Codul penal, art. 361 — interceptarea ilegală a unei transmisii). Folosește Wireshark <strong>doar</strong> pe: propriile mașini virtuale, rețele de laborator dedicate, sau pe propria conexiune cu acordul tuturor părților.
+  </div>
+
+  <h2>1. Ce vezi într-o captură</h2>
+  <p>Interfața Wireshark are 3 zone principale:</p>
+  <ol>
+    <li><strong>Lista de pachete</strong> — fiecare rând = un pachet, cu coloane: nr., timp, sursă, destinație, protocol, lungime, info.</li>
+    <li><strong>Detaliile pachetului selectat</strong> — arborele complet al protocoalelor, de la Ethernet la aplicație.</li>
+    <li><strong>Octeții bruti</strong> — bytes-by-bytes ai pachetului, hexa + ASCII.</li>
+  </ol>
+
+  <h2>2. Disectarea unei navigări HTTP simple</h2>
+  <p>Imaginează că deschizi <code>http://exemplu.ro</code> într-un browser. În Wireshark vei vedea în ordine:</p>
+
+  <pre><code>Nr. Time      Source           Destination      Proto   Info
+1   0.000000  192.168.1.10     192.168.1.1      DNS     Query A exemplu.ro
+2   0.012431  192.168.1.1      192.168.1.10     DNS     Response A 93.184.215.14
+3   0.013120  192.168.1.10     93.184.215.14    TCP     54123 → 80 [SYN]
+4   0.045892  93.184.215.14    192.168.1.10     TCP     80 → 54123 [SYN, ACK]
+5   0.046001  192.168.1.10     93.184.215.14    TCP     54123 → 80 [ACK]
+6   0.046523  192.168.1.10     93.184.215.14    HTTP    GET / HTTP/1.1
+7   0.089334  93.184.215.14    192.168.1.10     HTTP    HTTP/1.1 200 OK (text/html)
+8   0.090120  192.168.1.10     93.184.215.14    TCP     54123 → 80 [FIN, ACK]</code></pre>
+
+  <p>Citim:</p>
+  <ul>
+    <li>1–2: Rezoluție DNS (UDP/53).</li>
+    <li>3–5: Three-way handshake TCP (SYN, SYN-ACK, ACK).</li>
+    <li>6: Cererea HTTP GET.</li>
+    <li>7: Răspunsul serverului — 200 OK + HTML.</li>
+    <li>8: Începutul închiderii conexiunii.</li>
+  </ul>
+
+  <div class="callout warn">
+    <strong>👀 De ce nu mai vezi asta în 2026</strong>
+    Aproape tot Internetul folosește acum HTTPS (TLS). În locul liniilor 6–7 ai vedea pachete TLS criptate ilizibile. Wireshark poate decripta TLS doar dacă ai cheile sesiunii (de obicei le obții prin <code>SSLKEYLOGFILE</code> setat în browserul tău, înainte de captură, pe propria mașină).
+  </div>
+
+  <h2>3. Filtre — supraviețuirea în potop</h2>
+  <p>O captură de 5 minute pe o rețea activă poate avea zeci de mii de pachete. Filtrele Wireshark sunt instrumentul cel mai puternic. Exemple:</p>
+
+  <table class="tbl">
+    <thead><tr><th>Filtru</th><th>Ce arată</th></tr></thead>
+    <tbody>
+      <tr><td><code>http</code></td><td>Doar trafic HTTP</td></tr>
+      <tr><td><code>tcp.port == 443</code></td><td>Doar trafic pe portul 443</td></tr>
+      <tr><td><code>ip.addr == 93.184.215.14</code></td><td>Trafic implicând acel IP (sursă sau destinație)</td></tr>
+      <tr><td><code>tcp.flags.syn == 1 and tcp.flags.ack == 0</code></td><td>SYN inițiale (utile pentru scan detection)</td></tr>
+      <tr><td><code>dns.qry.name contains "google"</code></td><td>Cereri DNS pentru domenii care conțin „google”</td></tr>
+      <tr><td><code>http.request.method == "POST"</code></td><td>Doar request-urile POST (de obicei trimit date)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Ce poate detecta un analist</h2>
+  <ul>
+    <li><strong>Port scanning:</strong> multe SYN-uri din aceeași sursă către porturi diferite ale aceleiași destinații, fără handshake complet.</li>
+    <li><strong>Beaconing (malware):</strong> conexiuni regulate la intervale fixe (ex: la fiecare 60 sec) către un IP necunoscut — semn de C2 (command & control).</li>
+    <li><strong>Exfiltrare prin DNS:</strong> cereri DNS cu subdomenii foarte lungi, caractere ciudate, către același domeniu obscur.</li>
+    <li><strong>Conexiuni text-clear suspecte:</strong> FTP, Telnet, HTTP cu parole vizibile în clar.</li>
+  </ul>
+
+  <h2>5. Demo offline — fișierul .pcap</h2>
+  <p>Wireshark salvează capturi în format <code>.pcap</code> (sau noul <code>.pcapng</code>). Pentru exersare există seturi publice, etic puse la dispoziție:</p>
+  <ul>
+    <li><strong>Wireshark Wiki — Sample Captures</strong>: <code>wiki.wireshark.org/SampleCaptures</code></li>
+    <li><strong>Malware-Traffic-Analysis.net</strong>: capturi reale de malware, cu povești complete.</li>
+    <li><strong>NETRESEC PublicPCAPs</strong>: arhivă mare grupată pe categorii.</li>
+  </ul>
+
+  <div class="callout ok">
+    <strong>🧪 Activitatea 6 · Tema „Detectiv de pachete”</strong>
+    Descarcă din Wireshark Sample Captures un fișier <code>http.cap</code>. Răspunde pe caiet:
+    <ol>
+      <li>Câte cereri HTTP GET au fost făcute?</li>
+      <li>Care este browserul folosit (în antetul <code>User-Agent</code>)?</li>
+      <li>Care este IP-ul serverului și ce versiune de server web răspunde?</li>
+    </ol>
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>3 zone:</strong> lista de pachete · detaliile pachetului (arbore protocoale) · octeții bruți.</li>
+      <li><strong>Format de salvare:</strong> <code>.pcap</code> (clasic) sau <code>.pcapng</code> (nou).</li>
+      <li><strong>Filtre cheie:</strong> <code>http</code>, <code>tcp.port == 443</code>, <code>ip.addr == X</code>, <code>tcp.flags.syn == 1 and tcp.flags.ack == 0</code>.</li>
+      <li><strong>Tipare de detectat:</strong> multe SYN-uri spre porturi diferite (port scan), conexiuni regulate la interval fix (beaconing C2), subdomenii lungi (DNS tunneling).</li>
+      <li><strong>Etic:</strong> doar pe rețele proprii / laborator / cu autorizare. Art. 361 Cod penal pentru interceptare ilegală.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l6')">← L6</button>
+    <button class="btn" onclick="go('l8')">Următoarea: Linux security →</button>
+  </div>
+</section>
+
+<!-- ================ L8: LINUX SECURITY ================ -->
+<section id="sec-l8" class="section">
+  <div class="kicker">LECȚIA 8 · CS 4.1</div>
+  <h1>Linux security — fundamente</h1>
+  <p class="lead">Majoritatea serverelor care formează Internetul utilizează sisteme de operare bazate pe Linux. Înțelegerea modelului de securitate Linux nu este opțională pentru cineva care vrea să lucreze în cybersecurity — este alfabetul.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să distingi între utilizatori, grupuri, UID și GID;</li>
+      <li>să citești și să scrii permisiuni de fișiere în notație simbolică (rwx) și octală (755, 644, 600);</li>
+      <li>să explici de ce <code>sudo</code> este preferabil login-ului ca root;</li>
+      <li>să configurezi autentificarea SSH bazată pe chei publice/private;</li>
+      <li>să enumeri minimum 5 reguli de hardening de bază pentru un server Linux.</li>
+    </ul>
+  </div>
+
+  <h2>1. Utilizatori și grupuri</h2>
+  <p>Pe Linux, fiecare proces rulează în contextul unui <em>utilizator</em>. Fiecare utilizator are un <strong>UID</strong> (User ID) numeric și aparține unuia sau mai multor <strong>grupuri</strong> (cu GID).</p>
+  <ul>
+    <li><strong>root</strong> = UID 0 = superutilizator. Poate face orice.</li>
+    <li>Utilizatori de sistem (UID 1–999) = servicii (mysql, www-data, sshd).</li>
+    <li>Utilizatori normali (UID 1000+) = oameni reali.</li>
+  </ul>
+
+  <p>Comenzi utile:</p>
+  <pre><code>whoami          # cine sunt
+id              # UID, GID, grupuri secundare
+who             # cine este logat pe sistem
+cat /etc/passwd # toți utilizatorii cunoscuți de sistem</code></pre>
+
+  <h2>2. Permisiuni de fișiere — rwx</h2>
+  <p>Fiecare fișier sau director are 3 grupuri de permisiuni × 3 acțiuni:</p>
+
+  <pre><code>-rwxr-xr--  1  alice  staff  4096  Jun 10  raport.txt
+│└─┬─┘└─┬─┘└┬┘ └──┬─┘ └─┬─┘   └────────────┬─────────┘
+tip owner grup other  owner grup       data + nume
+
+r = read   (citește)
+w = write  (modifică)
+x = execute (rulează / intră în director)</code></pre>
+
+  <p>În notație octală, fiecare triplet rwx = o cifră 0–7:</p>
+  <table class="tbl">
+    <thead><tr><th>Octal</th><th>Binar</th><th>Permisiuni</th></tr></thead>
+    <tbody>
+      <tr><td>7</td><td>111</td><td>rwx</td></tr>
+      <tr><td>6</td><td>110</td><td>rw-</td></tr>
+      <tr><td>5</td><td>101</td><td>r-x</td></tr>
+      <tr><td>4</td><td>100</td><td>r--</td></tr>
+      <tr><td>0</td><td>000</td><td>---</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code>chmod 644 raport.txt    # rw-r--r--  (proprietar citește/scrie, restul doar citesc)
+chmod 755 script.sh     # rwxr-xr-x  (executabil, tipic pentru programe)
+chmod 600 cheie_ssh     # rw-------  (numai proprietarul; OBLIGATORIU pentru chei SSH)</code></pre>
+
+  <h2>3. sudo — privilegii temporare</h2>
+  <p>Filozofia Linux: <em>nu te loga ca root</em>. În loc, folosește contul tău normal și ridică privilegiile <strong>doar când e necesar</strong>, prin <code>sudo</code>:</p>
+
+  <pre><code>apt update                # eșuează — nu ai voie să modifici sistemul
+sudo apt update           # te întreabă parola, apoi rulează ca root</code></pre>
+
+  <p>Avantaje:</p>
+  <ul>
+    <li>Toate comenzile <code>sudo</code> sunt logate (<code>/var/log/auth.log</code>).</li>
+    <li>Poți acorda anumitor utilizatori dreptul de a rula <em>doar anumite comenzi</em> ca root (fișierul <code>/etc/sudoers</code>).</li>
+    <li>Greșelile accidentale se limitează — un <code>rm -rf /</code> tastat din greșeală fără sudo nu distruge sistemul.</li>
+  </ul>
+
+  <h2>4. SSH — accesul remote</h2>
+  <p>SSH (Secure Shell) este modul standard de a administra servere Linux de la distanță. Funcționează pe TCP/22, criptat, cu autentificare prin parolă sau (mult mai sigur) prin <strong>chei publice/private</strong>.</p>
+
+  <pre><code># Generează o pereche de chei (pe stația ta)
+ssh-keygen -t ed25519
+
+# Trimite cheia publică pe server
+ssh-copy-id alice@server.exemplu.ro
+
+# Acum te poți conecta fără parolă
+ssh alice@server.exemplu.ro</code></pre>
+
+  <div class="callout">
+    <strong>🔑 De ce chei și nu parole?</strong>
+    O parolă bună are 12–16 caractere de entropie. O cheie ed25519 are 256 de biți de entropie — practic neghicibilă prin forță brută. În plus, cheia privată nu părăsește niciodată calculatorul tău; parola trece pe rețea (chiar dacă criptat) la fiecare login.
+  </div>
+
+  <h2>5. Hardening de bază — 7 reguli minime</h2>
+
+  <ol>
+    <li><strong>Actualizări la zi.</strong> <code>apt update &amp;&amp; apt upgrade</code> regulat. Patch-urile de securitate nu se aplică singure.</li>
+    <li><strong>Dezactivează login-ul ca root prin SSH.</strong> În <code>/etc/ssh/sshd_config</code>: <code>PermitRootLogin no</code>.</li>
+    <li><strong>Dezactivează autentificarea cu parolă</strong> dacă folosești chei: <code>PasswordAuthentication no</code>.</li>
+    <li><strong>Schimbă portul SSH default.</strong> Nu oprește un atacator determinat, dar reduce dramatic zgomotul de fundal din scanări automate.</li>
+    <li><strong>fail2ban</strong> — blochează automat IP-uri care încearcă să ghicească parole.</li>
+    <li><strong>Firewall activ.</strong> Vezi L6.</li>
+    <li><strong>Minimalism.</strong> Dezinstalează pachete pe care nu le folosești. Suprafața de atac scade direct proporțional.</li>
+  </ol>
+
+  <h2>6. Loguri — unde să te uiți</h2>
+  <table class="tbl">
+    <thead><tr><th>Fișier</th><th>Conține</th></tr></thead>
+    <tbody>
+      <tr><td><code>/var/log/auth.log</code></td><td>Login-uri, sudo, SSH</td></tr>
+      <tr><td><code>/var/log/syslog</code></td><td>Mesaje generale de sistem</td></tr>
+      <tr><td><code>/var/log/kern.log</code></td><td>Mesaje de la kernel</td></tr>
+      <tr><td><code>/var/log/apache2/access.log</code></td><td>Cereri către serverul web</td></tr>
+      <tr><td>Comanda <code>journalctl</code></td><td>Pe sisteme cu systemd — interfață unificată</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Activitatea 7 · Permisiunile cheii SSH</h3>
+  <p>Pe o stație Linux, generează o cheie SSH cu <code>ssh-keygen</code>. Verifică permisiunile fișierului <code>~/.ssh/id_ed25519</code> cu <code>ls -la ~/.ssh/</code>. Ce permisiuni are? De ce <strong>trebuie</strong> să fie <code>600</code>? Ce s-ar întâmpla dacă ar fi <code>644</code>?</p>
+
+  <div class="callout ok">
+    <strong>✅ Răspuns</strong>
+    Permisiunile trebuie <code>600</code> (rw- doar pentru proprietar). Dacă sunt mai permisive, SSH refuză să folosească cheia și afișează <code>UNPROTECTED PRIVATE KEY FILE!</code> — pentru că orice utilizator de pe sistem ar putea citi cheia ta privată. SSH preferă să eșueze decât să accepte un risc cunoscut.
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>root</strong> = UID 0 = superutilizator. Nu te loga ca root, folosește <code>sudo</code>.</li>
+      <li><strong>Permisiuni:</strong> r=4, w=2, x=1. <code>chmod 755</code> = rwxr-xr-x · <code>chmod 644</code> = rw-r--r-- · <code>chmod 600</code> = rw------- (obligatoriu pentru chei SSH).</li>
+      <li><strong>SSH</strong> = TCP/22, criptat, autentificare cu chei (ed25519) > parolă.</li>
+      <li><strong>Hardening minim:</strong> updates la zi, <code>PermitRootLogin no</code>, <code>PasswordAuthentication no</code>, fail2ban, firewall.</li>
+      <li><strong>Loguri:</strong> <code>/var/log/auth.log</code>, <code>/var/log/syslog</code>, comanda <code>journalctl</code>.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l7')">← L7</button>
+    <button class="btn" onclick="go('l9')">Următoarea: CTF →</button>
+  </div>
+</section>
+
+<!-- ================ L9: CTF ================ -->
+<section id="sec-l9" class="section">
+  <div class="kicker">LECȚIA 9 · CS 4.2</div>
+  <h1>CTF — Capture The Flag introductiv</h1>
+  <p class="lead">Un CTF este o competiție de securitate cibernetică în care participanții rezolvă probleme („challenges”) și colectează <strong>flag-uri</strong> — șiruri de text de forma <code>CTF{ceva_secret}</code>. Este modul cel mai distractiv și etic de a învăța hacking.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să recunoști cele 6 categorii clasice de challenge-uri CTF;</li>
+      <li>să decodifici un text Base64 și un cifru Caesar/ROT13;</li>
+      <li>să analizezi un antet HTTP căutând informații expuse neintenționat;</li>
+      <li>să identifici un mesaj steganografic simplu;</li>
+      <li>să numești cel puțin 3 platforme legitime pentru exersarea CTF (picoCTF, OverTheWire, TryHackMe).</li>
+    </ul>
+  </div>
+
+  <h2>1. Categoriile clasice</h2>
+  <div class="cols-3">
+    <div class="col-card">
+      <h4>Crypto</h4>
+      <p>Decriptarea unor mesaje, spargerea unor cifruri slabe.</p>
+    </div>
+    <div class="col-card">
+      <h4>Web</h4>
+      <p>Vulnerabilități pe site-uri: SQL injection, XSS, IDOR.</p>
+    </div>
+    <div class="col-card">
+      <h4>Forensics</h4>
+      <p>Analiză de fișiere, capturi de rețea, imagini de memorie.</p>
+    </div>
+    <div class="col-card">
+      <h4>Reversing</h4>
+      <p>Descifrarea logicii unui program compilat fără sursă.</p>
+    </div>
+    <div class="col-card">
+      <h4>Pwn</h4>
+      <p>Exploatarea vulnerabilităților binare (buffer overflow etc).</p>
+    </div>
+    <div class="col-card">
+      <h4>OSINT</h4>
+      <p>Investigație din surse deschise (vezi Volumul 2, L1).</p>
+    </div>
+  </div>
+
+  <h2>2. Patru mini-challenge-uri — în browser</h2>
+  <p>Toate flag-urile pe care le cauți au forma <code>CTF{xxx}</code>. Tastează exact ce găsești în câmpul de răspuns; programul verifică automat.</p>
+
+  <!-- CHALLENGE 1: BASE64 -->
+  <div class="ctf-card">
+    <h4>🟢 Challenge 1 · Base64 (crypto, ușor)</h4>
+    <p>Tehnică folosită pentru a transmite date binare prin canale text. <em>Nu este criptare</em> — este doar codificare. Decodifică:</p>
+    <pre><code>Q1Rme3JldGVfaXNfbm90X2NyeXB0b30=</code></pre>
+    <p style="font-size:.88rem; color:var(--ink-mute)">Hint: caută în browser un decoder Base64, sau folosește <code>atob()</code> în consola DevTools (F12).</p>
+    <div class="ctf-input">
+      <input type="text" id="ctf1-in" placeholder="CTF{...}" autocomplete="off">
+      <button class="btn" onclick="checkCTF(1, 'CTF{rete_is_not_crypto}')">Trimite</button>
+    </div>
+    <p class="ctf-feedback" id="ctf1-fb"></p>
+  </div>
+
+  <!-- CHALLENGE 2: CAESAR -->
+  <div class="ctf-card">
+    <h4>🟢 Challenge 2 · Cifrul Caesar (crypto, ușor)</h4>
+    <p>Decalează fiecare literă cu un anumit număr de poziții în alfabet. Folosit de Iulius Caesar acum 2000 de ani. Mesajul de mai jos a fost criptat cu <strong>shift = 13</strong> (cifrul ROT13):</p>
+    <pre><code>PGS{ebg_gerprfcerm_qrf_pevcgb}</code></pre>
+    <p style="font-size:.88rem; color:var(--ink-mute)">Hint: A→N, B→O, … sau caută online „ROT13 decoder”.</p>
+    <div class="ctf-input">
+      <input type="text" id="ctf2-in" placeholder="CTF{...}" autocomplete="off">
+      <button class="btn" onclick="checkCTF(2, 'CTF{rot_treisprezece_des_cripto}')">Trimite</button>
+    </div>
+    <p class="ctf-feedback" id="ctf2-fb"></p>
+  </div>
+
+  <!-- CHALLENGE 3: HTTP HEADER -->
+  <div class="ctf-card">
+    <h4>🟡 Challenge 3 · Antet HTTP ascuns (web, mediu)</h4>
+    <p>Adesea developerii uită informații sensibile în antete HTTP personalizate. Iată un răspuns real-like de la un server:</p>
+    <pre><code>HTTP/1.1 200 OK
+Date: Wed, 10 Jun 2026 14:23:01 GMT
+Server: nginx/1.24.0
+Content-Type: text/html; charset=utf-8
+Content-Length: 1284
+X-Debug-Info: dev-build-93
+X-Flag: CTF{antetul_X_e_o_capcana}
+X-Powered-By: PHP/8.1
+Cache-Control: no-cache</code></pre>
+    <p style="font-size:.88rem; color:var(--ink-mute)">Citește atent și găsește flag-ul.</p>
+    <div class="ctf-input">
+      <input type="text" id="ctf3-in" placeholder="CTF{...}" autocomplete="off">
+      <button class="btn" onclick="checkCTF(3, 'CTF{antetul_X_e_o_capcana}')">Trimite</button>
+    </div>
+    <p class="ctf-feedback" id="ctf3-fb"></p>
+  </div>
+
+  <!-- CHALLENGE 4: STEGANO LIGHT -->
+  <div class="ctf-card">
+    <h4>🟡 Challenge 4 · Stegano-light (forensics, mediu)</h4>
+    <p>Steganografia ascunde mesaje în alte mesaje, în loc să le cripteze. Textul de mai jos pare un anunț normal, dar conține un mesaj ascuns. Citește <strong>prima literă a fiecărui cuvânt</strong>:</p>
+    <pre><code>Centrul Tehnic Federal { Reteaua
+Educationala Tinerilor Eleva
+Atenti }</code></pre>
+    <p style="font-size:.88rem; color:var(--ink-mute)">Atenție la majuscule. Spațiile dintre cuvinte le ignori; acoladele și conținutul lor reprezintă conținutul flag-ului.</p>
+    <div class="ctf-input">
+      <input type="text" id="ctf4-in" placeholder="CTF{...}" autocomplete="off">
+      <button class="btn" onclick="checkCTF(4, 'CTF{RETEA}')">Trimite</button>
+    </div>
+    <p class="ctf-feedback" id="ctf4-fb"></p>
+  </div>
+
+  <h2>3. Platforme CTF recomandate</h2>
+  <ul>
+    <li><strong>picoCTF</strong> (picoctf.org) — proiect Carnegie Mellon, dedicat liceenilor, conținut tot anul, în engleză, gratuit.</li>
+    <li><strong>OverTheWire</strong> — wargames clasice de Linux (Bandit, Natas, Krypton). Excelent pentru începători.</li>
+    <li><strong>TryHackMe</strong> — drumuri de învățare structurate cu mașini virtuale în browser.</li>
+    <li><strong>HackTheBox</strong> — nivel mediu/avansat, mai aproape de pentesting real.</li>
+    <li><strong>CTFtime</strong> — calendarul global al competițiilor CTF.</li>
+  </ul>
+
+  <div class="callout ok">
+    <strong>🎯 Recomandare</strong>
+    Dacă acesta este primul tău CTF, începe cu <strong>OverTheWire — Bandit</strong>: 34 de niveluri progresive de Linux/SSH, fiecare cu o singură lecție-cheie. Vei învăța comenzi reale ca să le poți folosi a doua zi la liceu.
+  </div>
+
+  <div class="retain">
+    <h4>📌 Ce trebuie să reții pentru examen</h4>
+    <ul>
+      <li><strong>6 categorii CTF:</strong> Crypto, Web, Forensics, Reversing, Pwn, OSINT.</li>
+      <li><strong>Formatul flag-ului:</strong> <code>CTF{...}</code> sau, în alte competiții, <code>FLAG{...}</code>, <code>HTB{...}</code>, <code>picoCTF{...}</code>.</li>
+      <li><strong>Base64</strong> = codificare, NU criptare. Recunoscibilă după caractere A–Z, a–z, 0–9, +, /, =.</li>
+      <li><strong>ROT13</strong> = caz particular de cifru Caesar cu deplasare 13; auto-invers (aplicat de două ori = original).</li>
+      <li><strong>Platforme legitime:</strong> picoCTF, OverTheWire Bandit, TryHackMe, HackTheBox, CTFtime.</li>
+    </ul>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l8')">← L8</button>
+    <button class="btn" onclick="go('l10')">Următoarea: Cariere + Evaluare →</button>
+  </div>
+</section>
+
+<!-- ================ L10: CARIERE + EVALUARE + CERTIFICAT ================ -->
+<section id="sec-l10" class="section">
+  <div class="kicker">LECȚIA 10 · CARIERE + EVALUARE SUMATIVĂ</div>
+  <h1>Cariere în cybersecurity + Evaluare finală</h1>
+  <p class="lead">Înainte de evaluarea finală, hai să vorbim despre <em>de ce</em>. La ce slujbă te uiți, ce calificări ai nevoie, ce drum poți să faci de la clasa a XI-a până la primul tău contract de muncă în domeniu.</p>
+
+  <div class="objectives">
+    <h4>🎯 La finalul lecției vei putea:</h4>
+    <ul>
+      <li>să identifici 6 direcții posibile de carieră în cybersecurity (Blue Team, Red Team, Forensics, GRC, AppSec, Cloud);</li>
+      <li>să descrii un drum educațional concret de la clasa a XI-a la primul rol junior;</li>
+      <li>să numești competițiile naționale și internaționale relevante pentru tineri;</li>
+      <li>să demonstrezi printr-o evaluare sumativă stăpânirea celor 9 lecții parcurse.</li>
+    </ul>
+  </div>
+
+  <h2>1. Hărțile carierei — 6 direcții posibile</h2>
+
+  <div class="cols-2">
+    <div class="col-card">
+      <h4>🛡️ Defensive (Blue Team)</h4>
+      <p><strong>Roluri:</strong> SOC Analyst, Incident Responder, Threat Hunter, Security Engineer.</p>
+      <p><strong>Activități tipice:</strong> monitorizare 24/7, răspuns la alerte, analiză de loguri, scriere de reguli SIEM.</p>
+      <p><strong>Skill-uri:</strong> Linux, rețele, SIEM (Splunk, ELK), scripting (Python).</p>
+    </div>
+    <div class="col-card">
+      <h4>⚔️ Ofensive (Red Team)</h4>
+      <p><strong>Roluri:</strong> Penetration Tester, Red Teamer, Bug Bounty Hunter.</p>
+      <p><strong>Activități tipice:</strong> simulare de atacuri controlate, găsire de vulnerabilități, scrierea unui raport care îi ajută pe ceilalți să se apere.</p>
+      <p><strong>Skill-uri:</strong> exploatare web/binară, OSINT, social engineering, Burp Suite, Metasploit.</p>
+    </div>
+    <div class="col-card">
+      <h4>🔍 Investigație și forensics</h4>
+      <p><strong>Roluri:</strong> Digital Forensics Analyst, Malware Analyst.</p>
+      <p><strong>Activități:</strong> analiză post-incident, recuperare de date, reverse-engineering de malware.</p>
+      <p><strong>Skill-uri:</strong> Volatility, Autopsy, Ghidra/IDA, asamblare.</p>
+    </div>
+    <div class="col-card">
+      <h4>📜 Guvernanță, risc, conformitate</h4>
+      <p><strong>Roluri:</strong> GRC Analyst, Security Auditor, ISO 27001 Lead Implementer.</p>
+      <p><strong>Activități:</strong> politici, audit, conformitate cu GDPR, NIS2, ISO 27001.</p>
+      <p><strong>Skill-uri:</strong> standarde, comunicare, scriere documente.</p>
+    </div>
+    <div class="col-card">
+      <h4>🧠 Application security</h4>
+      <p><strong>Roluri:</strong> AppSec Engineer, DevSecOps, Security Champion.</p>
+      <p><strong>Activități:</strong> code review de securitate, threat modeling, integrare scannere în pipeline.</p>
+      <p><strong>Skill-uri:</strong> programare solidă, OWASP Top 10, SAST/DAST.</p>
+    </div>
+    <div class="col-card">
+      <h4>☁️ Cloud security</h4>
+      <p><strong>Roluri:</strong> Cloud Security Engineer.</p>
+      <p><strong>Activități:</strong> configurarea sigură a AWS/Azure/GCP, IAM, infrastructure as code.</p>
+      <p><strong>Skill-uri:</strong> certificări cloud + minimul de securitate.</p>
+    </div>
+  </div>
+
+  <h2>2. Drumul concret din România (un exemplu posibil)</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <small>clasa a XI-a — acum</small>
+      <h4>Cyber Lab + un CTF începător</h4>
+      <p>Termină această resursă. Începe picoCTF sau OverTheWire Bandit. Instalează o mașină virtuală cu Ubuntu LTS pentru exersarea comenzilor Linux.</p>
+    </div>
+    <div class="tl-item">
+      <small>clasa a XII-a</small>
+      <h4>Olimpiada + proiect personal</h4>
+      <p>Participă la Olimpiada Națională de Securitate Cibernetică (organizată de DNSC). Începe să contribui la un proiect open-source de securitate. Profilul tău public pe HackTheBox poate conta ca portofoliu.</p>
+    </div>
+    <div class="tl-item">
+      <small>licență (anii 1–3)</small>
+      <h4>Calculatoare / Informatică / Cibernetică</h4>
+      <p>UTCN, Politehnica, UBB, ASE — toate au cursuri serioase de securitate. Sau facultățile MAI / SRI pentru drum în zona guvernamentală.</p>
+    </div>
+    <div class="tl-item">
+      <small>internship + prima certificare</small>
+      <h4>CompTIA Security+ / CCNA</h4>
+      <p>Internship-uri la Bitdefender, Safetech, Orange, ENEA. Prima certificare recunoscută internațional. Salariu junior SOC în România în 2026: zona 4 000–7 000 RON net.</p>
+    </div>
+    <div class="tl-item">
+      <small>3–5 ani experiență</small>
+      <h4>Specializare + certificări serioase</h4>
+      <p>OSCP, GIAC GPEN, CISSP. Decide dacă mergi adânc tehnic sau spre management. Salariile cresc semnificativ după primul rol senior.</p>
+    </div>
+  </div>
+
+  <h2>3. Olimpiada și competițiile naționale</h2>
+  <ul>
+    <li><strong>Olimpiada Națională de Securitate Cibernetică</strong> — organizată anual, cu probă teoretică și CTF.</li>
+    <li><strong>European Cybersecurity Challenge</strong> — etapa europeană pentru tineri sub 25 de ani.</li>
+    <li><strong>DefCamp</strong> — cel mai mare eveniment de securitate din Europa Centrală și de Est, găzduit în România. Are competiție CTF deschisă.</li>
+  </ul>
+
+  <hr style="margin: 40px 0; border: none; border-top: 1px solid var(--line);">
+
+  <h2>📋 Barem de evaluare formativă (pentru profesori)</h2>
+  <p>Pentru fiecare lecție există o <strong>activitate practică</strong> care poate fi evaluată la clasă. Mai jos, o grilă orientativă de notare 1–10.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Activitate</th><th>Conținut evaluat</th><th>Punctaj propus</th></tr></thead>
+    <tbody>
+      <tr><td>A1 — Identificare niveluri OSI</td><td>4 situații → 4 niveluri corect identificate</td><td>1 p × 4 = 4 p</td></tr>
+      <tr><td>A2 — Citire antet IP (TTL/traceroute)</td><td>Explicarea TTL + mecanismul traceroute</td><td>3 p + 3 p = 6 p</td></tr>
+      <tr><td>A3 — Studiu de caz Dyn 2016</td><td>Răspuns corect și argumentat în 2–3 propoziții</td><td>6 p (din 10)</td></tr>
+      <tr><td>A4 — Estonia 2007</td><td>3 întrebări (instituții vizate / importanță / instituție creată)</td><td>2 p × 3 = 6 p</td></tr>
+      <tr><td>A5 — Reguli firewall</td><td>5 reguli scrise corect (ACCEPT/DROP, port, sursă, destinație)</td><td>1 p × 5 + 2 p coerență = 7 p</td></tr>
+      <tr><td>A6 — Detectiv de pachete</td><td>3 întrebări pe captură <code>http.cap</code></td><td>2 p × 3 = 6 p</td></tr>
+      <tr><td>A7 — Permisiuni cheie SSH</td><td>Identificare permisiuni 600 + justificare</td><td>3 p + 3 p = 6 p</td></tr>
+      <tr><td>A8 — 4 CTF-uri interactive (L9)</td><td>Flag corect introdus în resursă</td><td>1,5 p × 4 = 6 p</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Rubrica de evaluare a unei activități</h3>
+  <table class="tbl">
+    <thead><tr><th>Calificativ</th><th>Criterii</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Excelent (9–10)</strong></td><td>Răspuns complet, corect, argumentat cu vocabular tehnic precis; identifică nuanțe.</td></tr>
+      <tr><td><strong>Bine (7–8)</strong></td><td>Răspuns corect în esență, dar cu mici imprecizii terminologice sau lipsa unor detalii.</td></tr>
+      <tr><td><strong>Suficient (5–6)</strong></td><td>Identifică ideea de bază, dar argumentația este superficială sau cu erori.</td></tr>
+      <tr><td><strong>Insuficient (1–4)</strong></td><td>Confuzii fundamentale între concepte; nu identifică nivelul/protocolul/atacul corect.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Itemi propuși pentru evaluare scrisă (suplimentar)</h3>
+  <ul>
+    <li><strong>Itemi obiectivi</strong> (cu alegere multiplă, adevărat/fals): 60% din puncte — verifică recunoașterea conceptelor (porturi, protocoale, tipuri de atacuri).</li>
+    <li><strong>Itemi semi-obiectivi</strong> (cu răspuns scurt, completare): 25% — verifică înțelegerea (explicare handshake, descriere amplificare).</li>
+    <li><strong>Itemi subiectivi</strong> (eseu structurat, studiu de caz): 15% — verifică transferul (proiectează reguli firewall pentru un scenariu nou, analizează un incident real).</li>
+  </ul>
+
+  <hr style="margin: 40px 0; border: none; border-top: 1px solid var(--line);">
+
+  <!-- ============ EVALUARE SUMATIVĂ ============ -->
+  <h2 id="eval">📝 Evaluare sumativă · 10 întrebări</h2>
+  <p>Acoperă toate cele 9 lecții parcurse. Pragul de promovare: <strong>7/10</strong>. La 7-8 → ✅ Promovat. La 9 → ⭐ Mențiune. La 10 → 🏆 Excelență. Certificatul PDF se generează automat după promovare.</p>
+
+  <div id="exam-container">
+    <!-- întrebările sunt injectate prin JS pentru a evita repetarea HTML -->
+  </div>
+
+  <button class="btn" id="evalBtn" onclick="gradeExam()">Trimite evaluarea</button>
+  <p id="exam-result" style="margin-top: 14px; font-family: var(--head); font-size: 1.2rem;"></p>
+
+  <!-- Certificat -->
+  <div id="cert-block" style="display: none; margin-top: 32px;">
+    <h2>🎓 Generează-ți certificatul</h2>
+    <p>Introdu numele și prenumele tău așa cum vrei să apară pe certificat:</p>
+    <input type="text" id="cert-name" class="name-in" placeholder="Ex: Popescu Maria" maxlength="60">
+    <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="btn" onclick="previewCert()">Previzualizează</button>
+      <button class="btn" onclick="generatePDF()">📄 Descarcă PDF</button>
+    </div>
+    <div id="cert-preview-area" style="margin-top: 18px;"></div>
+  </div>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('l9')">← L9</button>
+    <button class="btn" onclick="go('about')">Despre resursă →</button>
+  </div>
+</section>
+
+<!-- ================ DESPRE ================ -->
+<section id="sec-about" class="section">
+  <div class="kicker">DESPRE RESURSĂ</div>
+  <h1>Despre Cyber Lab</h1>
+
+  <div class="card" style="border-left: 4px solid var(--accent);">
+    <h3 style="margin-top:0">🪪 Metadate</h3>
+    <table class="tbl" style="margin: 6px 0;">
+      <tbody>
+        <tr><td><strong>Titlu</strong></td><td>Cyber Lab — Securitatea rețelelor și ethical hacking</td></tr>
+        <tr><td><strong>Volum</strong></td><td>3 (din seria <em>Cyber Education</em>)</td></tr>
+        <tr><td><strong>Nivel de învățământ</strong></td><td>Liceu · clasa a XI-a</td></tr>
+        <tr><td><strong>Disciplină</strong></td><td>Informatică / TIC (trunchi comun sau CDȘ)</td></tr>
+        <tr><td><strong>Autor</strong></td><td>prof. <strong>Elena Drăgan</strong></td></tr>
+        <tr><td><strong>Versiune</strong></td><td>v1.0</td></tr>
+        <tr><td><strong>Data publicării</strong></td><td>iunie 2026</td></tr>
+        <tr><td><strong>Licență</strong></td><td>CC BY-NC-SA 4.0</td></tr>
+        <tr><td><strong>Format</strong></td><td>HTML autonom (fără server, fără instalare)</td></tr>
+        <tr><td><strong>Limba</strong></td><td>Română</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">📚 Seria „Cyber Education”</h3>
+    <p><strong>Cyber Lab</strong> este Volumul 3 dintr-o serie progresivă de resurse educaționale deschise dedicate securității cibernetice în liceu, dezvoltată de prof. Elena Drăgan:</p>
+    <ul>
+      <li><strong>Volumul 1 · Cyber Start</strong> — clasa a IX-a · introducere în securitatea cibernetică (parole, phishing, igienă digitală)</li>
+      <li><strong>Volumul 2 · Cyber Protect</strong> — clasa a X-a · securitate avansată (OSINT, deepfake, identitate digitală)</li>
+      <li><strong>Volumul 3 · Cyber Lab</strong> — clasa a XI-a · rețele și ethical hacking <em>(această resursă)</em></li>
+    </ul>
+    <p>Cele trei volume pot fi parcurse independent sau, ideal, ca un parcurs longitudinal de 3 ani — câte un volum pe clasă, în trunchiul comun de TIC/Informatică sau în CDȘ.</p>
+  </div>
+
+  <h2>🎯 Țintă didactică</h2>
+  <p>Cyber Lab este destinat elevilor de clasa a XI-a care studiază Informatică (intensiv sau real) sau TIC. Pornește de la premisa că elevul are deja noțiuni de bază despre browser, cont, parolă (din Volumul 1) și despre identitate digitală + dezinformare (din Volumul 2), și introduce stratul tehnic al rețelelor.</p>
+
+  <h2>🏛️ Aliniere curriculară</h2>
+  <ul>
+    <li>Programa de Informatică / TIC pentru clasa a XI-a (filiera teoretică, profilul real)</li>
+    <li>Cadrul de competențe digitale <strong>DigComp 2.2</strong> (în special aria 4 — Securitate)</li>
+    <li>Strategia Națională de Securitate Cibernetică a României 2022–2027 (componenta educațională)</li>
+  </ul>
+
+  <h2>🧭 Competențe specifice vizate</h2>
+  <table class="tbl">
+    <thead><tr><th>Cod</th><th>Competență</th></tr></thead>
+    <tbody>
+      <tr><td>CS 1.1</td><td>Descrie funcțional protocoalele de rețea (OSI / TCP/IP)</td></tr>
+      <tr><td>CS 1.2</td><td>Aplică principii de adresare IP, NAT și transport TCP/UDP</td></tr>
+      <tr><td>CS 2.1</td><td>Analizează rolul DNS și riscurile asociate</td></tr>
+      <tr><td>CS 2.2</td><td>Identifică tipuri de atacuri DoS/DDoS și măsuri de apărare</td></tr>
+      <tr><td>CS 3.1</td><td>Configurează reguli de bază de firewall</td></tr>
+      <tr><td>CS 3.2</td><td>Citește o captură de trafic într-un instrument de tip Wireshark</td></tr>
+      <tr><td>CS 4.1</td><td>Aplică principii de hardening pe Linux</td></tr>
+      <tr><td>CS 4.2</td><td>Rezolvă probleme CTF introductive în condiții etice</td></tr>
+    </tbody>
+  </table>
+
+  <h2>🗺️ Mapare la programa școlară</h2>
+  <p>Tabelul de mai jos asociază fiecare lecție din această resursă cu competența specifică acoperită și cu domeniul de conținut din programa de Informatică / TIC pentru clasa a XI-a, conform Ordinului M.Ed. privind aprobarea programelor școlare.</p>
+  <table class="tbl">
+    <thead><tr><th>Lecție</th><th>Competență</th><th>Domeniu de conținut din programă</th></tr></thead>
+    <tbody>
+      <tr><td>L1 · Protocoale de rețea</td><td>CS 1.1</td><td>Rețele de calculatoare și comunicații</td></tr>
+      <tr><td>L2 · TCP/IP aprofundat</td><td>CS 1.2</td><td>Rețele de calculatoare și comunicații</td></tr>
+      <tr><td>L3 · DNS</td><td>CS 2.1</td><td>Servicii Internet</td></tr>
+      <tr><td>L4 · Atacuri DDoS</td><td>CS 2.2</td><td>Servicii Internet · Securitatea informației</td></tr>
+      <tr><td>L5 · Recapitulare</td><td>CS 1.1–2.2</td><td>Evaluare formativă intermediară</td></tr>
+      <tr><td>L6 · Firewall</td><td>CS 3.1</td><td>Securitatea informației</td></tr>
+      <tr><td>L7 · Wireshark (demo)</td><td>CS 3.2</td><td>Securitatea informației · Analiza traficului</td></tr>
+      <tr><td>L8 · Linux security</td><td>CS 4.1</td><td>Securitatea informației · Sisteme de operare</td></tr>
+      <tr><td>L9 · CTF introductiv</td><td>CS 4.2</td><td>Securitatea informației · Aplicații practice</td></tr>
+      <tr><td>L10 · Cariere + Evaluare</td><td>Transversală</td><td>Orientare în carieră · Evaluare sumativă</td></tr>
+    </tbody>
+  </table>
+
+  <h2>📐 Rubrica generală de evaluare a parcursului</h2>
+  <p>Calificativele de mai jos pot fi folosite pentru evaluarea sumativă a parcurgerii integrale a resursei (combinând scor la evaluarea finală, rezolvarea activităților practice și CTF-urile interactive).</p>
+  <table class="tbl">
+    <thead><tr><th>Nivel</th><th>Procent</th><th>Descriere</th></tr></thead>
+    <tbody>
+      <tr><td><strong>🏆 Excelent</strong></td><td>90–100%</td><td>Stăpânește toate conceptele, transferă cunoștințele în situații noi, rezolvă autonom toate activitățile și CTF-urile. Argumentează cu vocabular tehnic precis.</td></tr>
+      <tr><td><strong>⭐ Bine</strong></td><td>75–89%</td><td>Înțelege conceptele și rezolvă majoritatea sarcinilor cu sprijin minimal. Are mici imprecizii terminologice, dar reușește transferul la situații similare.</td></tr>
+      <tr><td><strong>✅ Suficient</strong></td><td>60–74%</td><td>Identifică ideile de bază și rezolvă sarcini reproductive. Necesită sprijin la transferul în situații noi sau la argumentare.</td></tr>
+      <tr><td><strong>📈 În dezvoltare</strong></td><td>sub 60%</td><td>Are confuzii fundamentale între concepte (ex: niveluri OSI, tipuri de atacuri). Se recomandă reparcurgerea lecțiilor și activităților, cu îndrumare suplimentară.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>⚖️ Cadrul legal — pentru profesori</h2>
+  <p>Această resursă include conținut despre tehnici de ethical hacking. Tot conținutul este formulat în logica „<em>înțelegere defensivă</em>” și conține avertismente etice și legale repetate. Cadrul de referință relevant pentru România:</p>
+  <ul>
+    <li>Legea 161/2003 — secțiunea privind criminalitatea informatică</li>
+    <li>Codul penal român, art. 360–366 (acces neautorizat, perturbare, transferul neautorizat, falsul informatic, frauda informatică)</li>
+    <li>GDPR + Legea 190/2018 — protecția datelor cu caracter personal</li>
+    <li>Directiva UE NIS 2 (transpusă în legislația națională în 2024–2025)</li>
+  </ul>
+
+  <h2>📊 Impact educațional estimat</h2>
+  <ol>
+    <li>Dezvoltarea unei înțelegeri structurale a modului în care funcționează Internetul, dincolo de „icoane care merg”.</li>
+    <li>Formarea unui vocabular tehnic profesional pe care îl pot folosi în continuare în liceu, în facultate și la job.</li>
+    <li>Conștientizarea cadrului etic și legal al disciplinei <strong>înainte</strong> ca elevul să dobândească capacitatea tehnică de a face rău.</li>
+    <li>Reducerea barierei de intrare în comunitățile CTF / open-source — primul pas făcut într-un cadru școlar protejat.</li>
+    <li>Creșterea numărului de elevi care iau în considerare o carieră în cybersecurity (un domeniu cu deficit cronic de specialiști în UE).</li>
+  </ol>
+
+  <h2>🛠️ Cerințe tehnice</h2>
+  <ul>
+    <li>Browser modern: Chrome 90+, Firefox 90+, Edge 90+, Safari 14+</li>
+    <li>Conexiune la prima încărcare (fonturi Google + jsPDF din CDN)</li>
+    <li>JavaScript activat</li>
+    <li>Pentru laboratoare opționale: o mașină virtuală cu o distribuție Linux educațională (recomandat <strong>Ubuntu 24.04 LTS</strong>). Distribuțiile specializate pentru securitate ofensivă, precum Kali Linux, pot fi explorate la nivel de aprofundare, sub îndrumarea profesorului.</li>
+  </ul>
+
+  <h2>🔐 Confidențialitate</h2>
+  <p>Resursa folosește <code>localStorage</code> pentru a reține: progresul lecțiilor, scorul evaluării, preferința de temă și numele introdus pentru certificat. <strong>Nu se trimite nimic spre niciun server al autorului.</strong> Singurele cereri externe sunt către <code>fonts.googleapis.com</code> și <code>cdnjs.cloudflare.com</code>.</p>
+
+  <h2>⚖️ Licență</h2>
+  <p>Acest material este licențiat sub <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ro" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</a>. Distribuie cu atribuirea autorului, doar necomercial, în condiții identice.</p>
+
+  <h2>📚 Bibliografie și resurse recomandate</h2>
+  <p>Resursele de mai jos au fost folosite la documentarea acestui material și sunt recomandate pentru aprofundare.</p>
+
+  <h3>Surse primare (RFC-uri, standarde IETF)</h3>
+  <ul class="biblio-list">
+    <li><strong>RFC 791</strong> — Internet Protocol (IPv4), J. Postel, 1981.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc791</span></li>
+    <li><strong>RFC 793</strong> — Transmission Control Protocol (TCP), J. Postel, 1981 (actualizat de RFC 9293, 2022).<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc9293</span></li>
+    <li><strong>RFC 768</strong> — User Datagram Protocol (UDP), J. Postel, 1980.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc768</span></li>
+    <li><strong>RFC 1034 / 1035</strong> — Domain Names: Concepts &amp; Implementation, P. Mockapetris, 1987.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc1035</span></li>
+    <li><strong>RFC 1918</strong> — Address Allocation for Private Internets, Y. Rekhter et al., 1996.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc1918</span></li>
+    <li><strong>RFC 4033</strong> — DNS Security Introduction and Requirements (DNSSEC), R. Arends et al., 2005.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc4033</span></li>
+    <li><strong>BCP 38 / RFC 2827</strong> — Network Ingress Filtering, P. Ferguson, D. Senie, 2000.<span class="biblio-meta">datatracker.ietf.org/doc/html/rfc2827</span></li>
+  </ul>
+
+  <h3>Ghiduri și framework-uri instituționale</h3>
+  <ul class="biblio-list">
+    <li><strong>NIST SP 800-41 Rev. 1</strong> — Guidelines on Firewalls and Firewall Policy.<span class="biblio-meta">csrc.nist.gov/publications</span></li>
+    <li><strong>NIST SP 800-61 Rev. 2</strong> — Computer Security Incident Handling Guide.<span class="biblio-meta">csrc.nist.gov/publications</span></li>
+    <li><strong>NIST Cybersecurity Framework 2.0</strong> — funcțiile Identify, Protect, Detect, Respond, Recover, Govern.<span class="biblio-meta">nist.gov/cyberframework</span></li>
+    <li><strong>ENISA Threat Landscape</strong> — raport anual al Agenției Uniunii Europene pentru Securitate Cibernetică.<span class="biblio-meta">enisa.europa.eu</span></li>
+    <li><strong>ENISA — Cybersecurity Skills Development in the EU</strong>.<span class="biblio-meta">enisa.europa.eu</span></li>
+    <li><strong>OWASP Top 10</strong> — cele mai critice riscuri de securitate pentru aplicații web.<span class="biblio-meta">owasp.org/Top10</span></li>
+  </ul>
+
+  <h3>Resurse educaționale</h3>
+  <ul class="biblio-list">
+    <li><strong>Cisco Networking Academy</strong> — cursurile <em>Introduction to Networks</em> (CCNA ITN) și <em>Introduction to Cybersecurity</em>.<span class="biblio-meta">netacad.com</span></li>
+    <li><strong>Wireshark User's Guide</strong> — documentația oficială cu exemple de filtre și capturi.<span class="biblio-meta">wireshark.org/docs</span></li>
+    <li><strong>Wireshark Sample Captures</strong> — fișiere <code>.pcap</code> pentru exersare.<span class="biblio-meta">wiki.wireshark.org/SampleCaptures</span></li>
+    <li><strong>Malware-Traffic-Analysis.net</strong> — capturi reale de malware cu explicații.<span class="biblio-meta">malware-traffic-analysis.net</span></li>
+    <li><strong>picoCTF / OverTheWire / TryHackMe / HackTheBox</strong> — platforme CTF pentru începători → avansați.</li>
+    <li><strong>CTFtime</strong> — calendarul competițiilor CTF la nivel global.<span class="biblio-meta">ctftime.org</span></li>
+  </ul>
+
+  <h3>Cadrul legal și autorități naționale</h3>
+  <ul class="biblio-list">
+    <li><strong>Legea 161/2003</strong> — privind unele măsuri pentru asigurarea transparenței + Titlul III referitor la criminalitatea informatică.</li>
+    <li><strong>Codul penal român</strong>, art. 360–366 — infracțiuni contra siguranței și integrității sistemelor și datelor informatice.</li>
+    <li><strong>Regulamentul UE 2016/679 (GDPR)</strong> și <strong>Legea 190/2018</strong> — protecția datelor cu caracter personal.</li>
+    <li><strong>Directiva UE 2022/2555 (NIS 2)</strong> — securitatea rețelelor și a sistemelor informatice.</li>
+    <li><strong>DNSC</strong> — Directoratul Național de Securitate Cibernetică (succesorul CERT-RO).<span class="biblio-meta">dnsc.ro</span></li>
+    <li><strong>Strategia Națională de Securitate Cibernetică a României 2022–2027</strong>.</li>
+  </ul>
+
+  <h2>👤 Autor</h2>
+  <p>prof. <strong>Elena Drăgan</strong> · Cyber Lab v1.0 · iunie 2026</p>
+
+  <div class="nav-foot">
+    <button class="btn ghost" onclick="go('home')">← Acasă</button>
+  </div>
+</section>
+
+  </main>
+
+</div>
+
+<footer>
+  🔒 <strong>Cyber Lab</strong> v1.0 · seria <em>Cyber Education</em> · © 2026 prof. Elena Drăgan · CC BY-NC-SA 4.0
+</footer>
+</div>
+
+<!-- ============== SCRIPT CORE ============== -->
+<script>
+const STORAGE_KEY = 'cyberlab_v1';
+const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+state.visited = state.visited || {};
+state.theme = state.theme || 'dark';
+state.name = state.name || '';
+state.quizScore = state.quizScore ?? null;
+state.quizAnswers = state.quizAnswers || {};
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+// theme
+function applyTheme(t) {
+  document.body.dataset.theme = t;
+  state.theme = t;
+  save();
+}
+applyTheme(state.theme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+});
+
+// navigation
+const sections = ['home','l1','l2','l3','l4','l5','l6','l7','l8','l9','l10','about'];
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + id));
+  document.querySelectorAll('nav.sidebar a').forEach(a => a.classList.toggle('active', a.dataset.section === id));
+  if (id.startsWith('l') && id !== 'about') {
+    state.visited[id] = true;
+    save();
+    updateProgress();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('nav.sidebar a').forEach(a => {
+  a.addEventListener('click', () => showSection(a.dataset.section));
+});
+
+function updateProgress() {
+  const lessons = ['l1','l2','l3','l4','l5','l6','l7','l8','l9','l10'];
+  const done = lessons.filter(l => state.visited[l]).length;
+  document.querySelectorAll('nav.sidebar a').forEach(a => {
+    a.classList.toggle('done', !!state.visited[a.dataset.section]);
+  });
+  document.querySelectorAll('.lesson-card').forEach(c => {
+    c.classList.toggle('done', !!state.visited[c.dataset.go]);
+  });
+  const bar = document.getElementById('progressBar');
+  const txt = document.getElementById('progressText');
+  if (bar) bar.style.width = (done / lessons.length * 100) + '%';
+  if (txt) txt.textContent = done + ' / ' + lessons.length + ' lecții parcurse';
+}
+
+// expose for inline buttons
+window.go = showSection;
+
+// === QUIZ DE RECAPITULARE (L5) ===
+function checkRecap() {
+  const questions = document.querySelectorAll('#sec-l5 .quiz-q');
+  let correct = 0;
+  questions.forEach(q => {
+    const opts = q.querySelectorAll('.quiz-opt');
+    const correctIdx = parseInt(q.dataset.correct);
+    const selectedIdx = Array.from(opts).findIndex(o => o.classList.contains('selected'));
+    const feedback = q.querySelector('.quiz-feedback');
+    if (selectedIdx === correctIdx) {
+      opts[selectedIdx].classList.add('correct');
+      correct++;
+      feedback.textContent = '✓ Corect.';
+    } else {
+      if (selectedIdx >= 0) opts[selectedIdx].classList.add('wrong');
+      opts[correctIdx].classList.add('correct');
+      feedback.textContent = '✗ Răspunsul corect este marcat verde.';
+    }
+    feedback.classList.add('show');
+  });
+  document.getElementById('recap-score').textContent = `Scor: ${correct} / ${questions.length}`;
+}
+
+// Selectarea opțiunilor (delegare event)
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.quiz-opt')) {
+    const opt = e.target.closest('.quiz-opt');
+    const q = opt.closest('.quiz-q');
+    if (!q) return;
+    q.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+  }
+});
+
+// === CTF CHALLENGES (L9) ===
+function normalize(s) {
+  return (s || '').trim().toLowerCase().replace(/\s+/g, '');
+}
+function checkCTF(num, expected) {
+  const inp = document.getElementById('ctf' + num + '-in');
+  const fb = document.getElementById('ctf' + num + '-fb');
+  const val = normalize(inp.value);
+  const exp = normalize(expected);
+  if (val === exp) {
+    fb.textContent = '🚩 Corect! Flag valid: ' + expected;
+    fb.className = 'ctf-feedback ok';
+    inp.style.borderColor = 'var(--ok)';
+  } else {
+    fb.textContent = val.length === 0
+      ? 'Introdu un flag de forma CTF{...}'
+      : '❌ Nu este corect. Mai încearcă.';
+    fb.className = 'ctf-feedback no';
+  }
+}
+
+// === EVALUARE SUMATIVĂ (L10) ===
+const examQuestions = [
+  {
+    q: '1. La ce nivel din modelul OSI lucrează adresele IP?',
+    opts: ['Nivelul 2 (Legătură de date)', 'Nivelul 3 (Rețea)', 'Nivelul 4 (Transport)', 'Nivelul 7 (Aplicație)'],
+    correct: 1
+  },
+  {
+    q: '2. Care dintre următoarele NU este o adresă privată RFC 1918?',
+    opts: ['10.0.0.5', '172.16.1.1', '192.168.0.10', '8.8.8.8'],
+    correct: 3
+  },
+  {
+    q: '3. Care este secvența corectă a three-way handshake TCP?',
+    opts: ['SYN → ACK → FIN', 'SYN → SYN-ACK → ACK', 'GET → 200 OK → CLOSE', 'PING → PONG → ACK'],
+    correct: 1
+  },
+  {
+    q: '4. La ce folosește în mod normal portul 443?',
+    opts: ['SSH', 'DNS', 'HTTPS (HTTP peste TLS)', 'SMTP'],
+    correct: 2
+  },
+  {
+    q: '5. Un atac de amplificare DNS funcționează pentru că:',
+    opts: [
+      'DNS-ul este criptat',
+      'Răspunsul DNS este mult mai mare decât interogarea, iar atacatorul falsifică adresa sursă',
+      'Resolverele blochează automat orice trafic suspect',
+      'Routerele nu permit pachete UDP'
+    ],
+    correct: 1
+  },
+  {
+    q: '6. Filozofia „default-deny" la firewall înseamnă:',
+    opts: [
+      'Tot ce nu este interzis explicit, este permis',
+      'Tot ce nu este permis explicit, este refuzat',
+      'Se permite traficul doar din rețeaua locală',
+      'Se blochează toate porturile sub 1024'
+    ],
+    correct: 1
+  },
+  {
+    q: '7. În Wireshark, filtrul <code>tcp.flags.syn == 1 and tcp.flags.ack == 0</code> arată:',
+    opts: [
+      'Toate pachetele TCP',
+      'Doar răspunsurile la handshake',
+      'SYN-uri inițiale — utile pentru a detecta scanări de porturi',
+      'Pachete UDP'
+    ],
+    correct: 2
+  },
+  {
+    q: '8. De ce este obligatoriu ca o cheie privată SSH să aibă permisiunile 600?',
+    opts: [
+      'Pentru ca SSH să ruleze mai rapid',
+      'Pentru ca alți utilizatori de pe sistem să nu o poată citi — SSH refuză să o folosească altfel',
+      'Pentru a economisi spațiu pe disc',
+      'Pentru că este o cerință a Linux kernel'
+    ],
+    correct: 1
+  },
+  {
+    q: '9. Într-un CTF, formatul tipic al unui „flag" este:',
+    opts: [
+      'Un fișier .pdf',
+      'O imagine cu un steag',
+      'Un șir de tipul CTF{...} ascuns într-un challenge',
+      'Adresa IP a unui server'
+    ],
+    correct: 2
+  },
+  {
+    q: '10. Care dintre următoarele acțiuni este ILEGALĂ în România conform Codului penal?',
+    opts: [
+      'Să rulezi nmap pe propria ta mașină virtuală',
+      'Să participi la picoCTF',
+      'Să scanezi porturile unui server fără acordul scris al proprietarului',
+      'Să citești documentația Wireshark'
+    ],
+    correct: 2
+  }
+];
+
+function buildExam() {
+  const container = document.getElementById('exam-container');
+  if (!container) return;
+  container.innerHTML = examQuestions.map((q, idx) => `
+    <div class="quiz-q" data-correct="${q.correct}" data-idx="${idx}">
+      <h4>${q.q}</h4>
+      ${q.opts.map((opt, i) => `<label class="quiz-opt" data-opt="${i}">${opt}</label>`).join('')}
+      <p class="quiz-feedback"></p>
+    </div>
+  `).join('');
+}
+buildExam();
+
+function gradeExam() {
+  const qs = document.querySelectorAll('#exam-container .quiz-q');
+  let score = 0;
+  let unanswered = 0;
+  qs.forEach(q => {
+    const opts = q.querySelectorAll('.quiz-opt');
+    const correctIdx = parseInt(q.dataset.correct);
+    const selectedIdx = Array.from(opts).findIndex(o => o.classList.contains('selected'));
+    const feedback = q.querySelector('.quiz-feedback');
+    opts.forEach(o => { o.classList.remove('correct', 'wrong'); });
+    if (selectedIdx < 0) {
+      unanswered++;
+      feedback.textContent = '⚠ Nu ai răspuns. Răspunsul corect este marcat verde.';
+      opts[correctIdx].classList.add('correct');
+    } else if (selectedIdx === correctIdx) {
+      score++;
+      opts[selectedIdx].classList.add('correct');
+      feedback.textContent = '✓ Corect.';
+    } else {
+      opts[selectedIdx].classList.add('wrong');
+      opts[correctIdx].classList.add('correct');
+      feedback.textContent = '✗ Răspunsul corect este marcat verde.';
+    }
+    feedback.classList.add('show');
+  });
+
+  state.quizScore = score;
+  save();
+
+  const result = document.getElementById('exam-result');
+  const certBlock = document.getElementById('cert-block');
+  let msg = `Scor final: ${score} / 10`;
+  if (unanswered > 0) msg += ` · ${unanswered} fără răspuns`;
+  if (score >= 7) {
+    let mention = '';
+    if (score === 10) mention = ' · 🏆 EXCELENȚĂ';
+    else if (score === 9) mention = ' · ⭐ MENȚIUNE';
+    else mention = ' · ✅ PROMOVAT';
+    msg += mention;
+    result.style.color = 'var(--ok)';
+    certBlock.style.display = 'block';
+    // pre-populate nume dacă există
+    const nameInp = document.getElementById('cert-name');
+    if (state.name) nameInp.value = state.name;
+  } else {
+    msg += ' · Pragul de promovare este 7/10. Mai parcurge o dată lecțiile și încearcă din nou.';
+    result.style.color = 'var(--warn)';
+    certBlock.style.display = 'none';
+  }
+  result.textContent = msg;
+  result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// === CERTIFICAT ===
+function getMention(score) {
+  if (score === 10) return { txt: '🏆 EXCELENȚĂ', color: '#b45309' };
+  if (score === 9)  return { txt: '⭐ MENȚIUNE', color: '#b45309' };
+  if (score >= 7)   return { txt: '✅ PROMOVAT', color: '#15803d' };
+  return null;
+}
+
+function previewCert() {
+  const nameInp = document.getElementById('cert-name');
+  const name = nameInp.value.trim();
+  if (!name) { alert('Introdu numele.'); return; }
+  state.name = name; save();
+  const mention = getMention(state.quizScore);
+  const today = new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' });
+  document.getElementById('cert-preview-area').innerHTML = `
+    <div class="cert-preview">
+      <h2>CERTIFICAT DE PARTICIPARE</h2>
+      <div class="cert-sub">Cyber Lab · Volumul 3 din seria Cyber Education</div>
+      <div class="cert-badges">
+        <span class="cert-badge">Nivel: Intermediar-Avansat</span>
+        <span class="cert-badge">Clasa: a XI-a</span>
+        <span class="cert-badge gold">Scor: ${state.quizScore}/10</span>
+      </div>
+      <div>Se acordă elevului / elevei</div>
+      <div class="cert-name">${name}</div>
+      <div class="cert-body">pentru parcurgerea integrală a resursei educaționale deschise „Cyber Lab — Securitatea rețelelor și ethical hacking" și promovarea evaluării sumative finale.</div>
+      <div class="cert-mention" style="color: ${mention.color}">${mention.txt}</div>
+      <div class="cert-foot">
+        Eliberat la ${today} · prof. Elena Drăgan · CC BY-NC-SA 4.0<br>
+        Document de tip attestation de parcours — nu reprezintă act de studii recunoscut oficial.
+      </div>
+    </div>
+  `;
+  document.getElementById('cert-preview-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generatePDF() {
+  const nameInp = document.getElementById('cert-name');
+  const name = nameInp.value.trim();
+  if (!name) { alert('Introdu numele înainte de a genera PDF-ul.'); return; }
+  state.name = name; save();
+
+  const mention = getMention(state.quizScore);
+  const today = new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const W = 297, H = 210;
+
+  // background tint
+  doc.setFillColor(248, 250, 252);
+  doc.rect(0, 0, W, H, 'F');
+
+  // double border
+  doc.setDrawColor(30, 58, 138);
+  doc.setLineWidth(2);
+  doc.rect(10, 10, W - 20, H - 20);
+  doc.setLineWidth(0.5);
+  doc.rect(13, 13, W - 26, H - 26);
+
+  // header
+  doc.setTextColor(30, 58, 138);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(30);
+  doc.text('CERTIFICAT DE PARTICIPARE', W / 2, 38, { align: 'center' });
+
+  // subtitle
+  doc.setTextColor(71, 85, 105);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(13);
+  doc.text('Cyber Lab · Volumul 3 din seria Cyber Education', W / 2, 48, { align: 'center' });
+
+  // badges
+  doc.setFillColor(30, 58, 138);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9);
+  const bY = 58;
+  // badge 1
+  doc.roundedRect(W/2 - 65, bY, 40, 7, 2, 2, 'F');
+  doc.text('Nivel: Intermediar-Avansat', W/2 - 45, bY + 5, { align: 'center' });
+  // badge 2
+  doc.roundedRect(W/2 - 20, bY, 30, 7, 2, 2, 'F');
+  doc.text('Clasa: a XI-a', W/2 - 5, bY + 5, { align: 'center' });
+  // badge 3 (gold)
+  doc.setFillColor(180, 83, 9);
+  doc.roundedRect(W/2 + 15, bY, 35, 7, 2, 2, 'F');
+  doc.text('Scor: ' + state.quizScore + '/10', W/2 + 32.5, bY + 5, { align: 'center' });
+
+  // body
+  doc.setTextColor(15, 23, 42);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text('Se acordă elevului / elevei', W / 2, 82, { align: 'center' });
+
+  // name (large)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(28);
+  doc.setTextColor(15, 23, 42);
+  doc.text(name, W / 2, 100, { align: 'center' });
+  doc.setLineWidth(0.8);
+  doc.setDrawColor(30, 58, 138);
+  const nameWidth = doc.getTextWidth(name);
+  doc.line(W/2 - nameWidth/2 - 10, 103, W/2 + nameWidth/2 + 10, 103);
+
+  // description
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(30, 41, 59);
+  const desc = 'pentru parcurgerea integrală a resursei educaționale deschise „Cyber Lab —';
+  const desc2 = 'Securitatea rețelelor și ethical hacking" și promovarea evaluării sumative finale.';
+  doc.text(desc, W / 2, 116, { align: 'center' });
+  doc.text(desc2, W / 2, 123, { align: 'center' });
+
+  // mention
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  const [r,g,b] = mention.color === '#b45309' ? [180, 83, 9] : [21, 128, 61];
+  doc.setTextColor(r, g, b);
+  doc.text(mention.txt.replace(/[🏆⭐✅]/g, '').trim(), W / 2, 140, { align: 'center' });
+
+  // footer
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Eliberat la ' + today, W / 2, 165, { align: 'center' });
+  doc.text('prof. Elena Drăgan · CC BY-NC-SA 4.0', W / 2, 172, { align: 'center' });
+  doc.setFontSize(8);
+  doc.text('Document de tip attestation de parcours — nu reprezintă act de studii recunoscut oficial.', W / 2, 184, { align: 'center' });
+
+  // signature line
+  doc.setDrawColor(100, 116, 139);
+  doc.setLineWidth(0.3);
+  doc.line(W/2 - 35, 158, W/2 + 35, 158);
+
+  const safeName = name.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
+  doc.save(`Certificat_Cyber_Lab_${safeName}.pdf`);
+}
+
+// init progres la încărcare
+updateProgress();
+</script>
+
+</body>
+</html>
